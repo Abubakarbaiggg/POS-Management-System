@@ -1,0 +1,67 @@
+﻿@model POS_Management_System.Models.StockIn
+
+@{
+    ViewData["Title"] = "Stock In Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">Stock In Details</h4>
+        </div>
+        <div class="card-body">
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Stock In ID</dt>
+                        <dd class="col-sm-8">@Model.Id</dd>
+                        
+                        <dt class="col-sm-4">Date</dt>
+                        <dd class="col-sm-8">@Model.Date.ToString("yyyy-MM-dd")</dd>
+                        
+                        <dt class="col-sm-4">Supplier</dt>
+                        <dd class="col-sm-8">@Model.Supplier?.Name</dd>
+                        
+                        <dt class="col-sm-4">Phone</dt>
+                        <dd class="col-sm-8">@Model.Supplier?.Phone</dd>
+                    </dl>
+                </div>
+            </div>
+            
+            <hr />
+            <h5>Products Purchased</h5>
+            
+            <table class="table table-bordered">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Purchase Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.StockInDetails!)
+                    {
+                        <tr>
+                            <td>@item.Product?.Name</td>
+                            <td>@item.Quantity</td>
+                            <td>@item.PurchasePrice.ToString("N2")</td>
+                            <td>@item.Total.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="table-primary">  
+                        <th colspan="3" class="text-end">Grand Total:</th>
+                        <th>@Model.StockInDetails?.Sum(d => d.Total).ToString("N2")</th>
+                    </tr>
+                </tfoot>
+            </table>
+            
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+</div>  

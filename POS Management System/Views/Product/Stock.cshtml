@@ -1,0 +1,43 @@
+﻿@model POS_Management_System.Models.Product
+
+@{
+    ViewData["Title"] = "Update Stock";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4>Update Stock - @Model.Name</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Stock" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        
+                        <div class="alert alert-secondary">
+                            <strong>Current Stock:</strong> @Model.Quantity units
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">New Stock Quantity</label>
+                            <input type="number" name="quantity" class="form-control" value="@Model.Quantity" required min="0" />
+                            <small class="text-muted">Enter the new stock quantity (overwrites current stock)</small>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <strong>⚠️ Note:</strong> This will replace the current stock quantity.
+                            For purchases, use <strong>Stock In</strong> module instead.
+                        </div>
+                        
+                        <div class="mb-3">
+                            <button type="submit" class="btn btn-info">Update Stock</button>
+                            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

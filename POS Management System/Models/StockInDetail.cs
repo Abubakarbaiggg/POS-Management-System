@@ -21,6 +21,11 @@ namespace POS_Management_System.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal PurchasePrice { get; set; }
 
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Total { get; set; }
+
+
         [ForeignKey("StockInId")]
         public virtual StockIn? StockIn { get; set; }
 

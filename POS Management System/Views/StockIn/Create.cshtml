@@ -1,0 +1,181 @@
+﻿@model POS_Management_System.Models.ViewModels.StockInViewModel
+
+@{
+    ViewData["Title"] = "New Stock In";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">New Stock In / Purchase</h4>
+        </div>
+        <div class="card-body">
+            
+            <form id="stockInForm" asp-action="Create" method="post">
+                <input type="hidden" id="productsJson" name="productsJson" />
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="SupplierId" class="form-label">Supplier</label>
+                            <select asp-for="SupplierId" asp-items="ViewBag.Suppliers" class="form-select">
+                                <option value="">-- Select Supplier --</option>
+                            </select>
+                            <span asp-validation-for="SupplierId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Date" class="form-label">Date</label>
+                            <input asp-for="Date" class="form-control" type="date" />
+                            <span asp-validation-for="Date" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr />
+                <h5>Products</h5>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <select id="productSelect" class="form-select">
+                            <option value="">-- Select Product --</option>
+                            @foreach (var product in ViewBag.Products)
+                            {
+                                <option value="@product.Id" data-price="@product.PurchasePrice" data-name="@product.Name">
+                                    @product.Name - Stock: @product.Quantity
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" id="quantity" class="form-control" placeholder="Quantity" min="1" />
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" id="price" class="form-control" placeholder="Price" step="0.01" />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" id="addProductBtn" class="btn btn-success">Add Product</button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="productsTable">
+                        <thead class="table-secondary">
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end">Grand Total:</th>
+                                <th id="grandTotal">0.00</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Save Stock In</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let products = [];
+        
+        $('#addProductBtn').click(function() {
+            let productId = $('#productSelect').val();
+            let productName = $('#productSelect option:selected').data('name');
+            let purchasePrice = $('#productSelect option:selected').data('price');
+            let quantity = $('#quantity').val();
+            let price = $('#price').val() || purchasePrice;
+    
+            if (!productId || productId === '') {
+                alert('Please select a product');
+                return;
+            }
+    
+            if (!quantity || quantity < 1) {
+                alert('Please enter valid quantity');
+                return;
+            }
+    
+            if (!price || price <= 0) {
+                alert('Please enter valid price');
+                return;
+            }
+    
+            let total = parseFloat(quantity) * parseFloat(price);
+    
+            let existingIndex = products.findIndex(p => p.productId == productId);
+            if (existingIndex > -1) {
+                products[existingIndex].quantity += parseInt(quantity);
+                products[existingIndex].total = products[existingIndex].quantity * products[existingIndex].purchasePrice;
+            } else {
+                products.push({
+                    productId: parseInt(productId),    
+                    productName: productName,
+                    quantity: parseInt(quantity),
+                    purchasePrice: parseFloat(price),
+                    total: total
+                });
+            }
+    
+            refreshTable();
+    
+            $('#productSelect').val('');
+            $('#quantity').val('');
+            $('#price').val('');
+        });
+        
+        function removeProduct(index) {
+            products.splice(index, 1);
+            refreshTable();
+        }
+        
+        function refreshTable() {
+            let tbody = $('#productsTableBody');
+            tbody.empty();
+            let grandTotal = 0;
+            
+            for (let i = 0; i < products.length; i++) {
+                let p = products[i];
+                grandTotal += p.total;
+                
+                let row = `<tr>
+                    <td>${p.productName}</td>
+                    <td>${p.quantity}</td>
+                    <td>${p.purchasePrice.toFixed(2)}</td>
+                    <td>${p.total.toFixed(2)}</td>
+                    <td><button type="button" class="btn btn-sm btn-danger" onclick="removeProduct(${i})">Remove</button></td>
+                </tr>`;
+                tbody.append(row);
+            }
+            
+            $('#grandTotal').text(grandTotal.toFixed(2));
+        }
+        
+        $('form').submit(function(e) {
+            if (products.length === 0) {
+                e.preventDefault();
+                alert('Please add at least one product');
+                return false;
+            }
+            $('#productsJson').val(JSON.stringify(products));
+            return true;
+        });
+    </script>
+}   

@@ -14,6 +14,15 @@ namespace POS_Management_System.Models
         [StringLength(20)]
         [Phone]
         public string Phone { get; set; } = string.Empty;
+
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        [StringLength(100)]
+        public string? Email { get; set; }  
+
+        [StringLength(500)]
+        public string? Address { get; set; }  
+
+
         public virtual ICollection<StockIn>? StockIns { get; set; }
     }
 }

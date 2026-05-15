@@ -31,6 +31,8 @@ namespace POS_Management_System.Models
         [ForeignKey("CategoryId")]
         public virtual Category? Category { get; set; }
 
+        [NotMapped]
+        public IFormFile? ImageFile { get; set; }
         public virtual ICollection<SaleDetail>? SaleDetails { get; set; }
         public virtual ICollection<StockInDetail>? StockInDetails { get; set; }
     }
