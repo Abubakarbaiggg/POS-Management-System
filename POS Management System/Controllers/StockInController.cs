@@ -51,7 +51,8 @@ namespace POS_Management_System.Controllers
                 return View(model);
             }
 
-            var products = JsonSerializer.Deserialize<List<StockInProductItem>>(productsJson);
+            var products = JsonSerializer.Deserialize<List<StockInProductItem>>(productsJson,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             if (products == null || products.Count == 0)
             {
