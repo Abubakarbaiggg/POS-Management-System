@@ -57,23 +57,9 @@ namespace POS_Management_System.Controllers
             }
             if(ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if(!CategoryExists(category.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+               _context.Update(category);
+               await _context.SaveChangesAsync();
+               return RedirectToAction(nameof(Index));
             }
             return View(category);
         }
@@ -90,6 +76,7 @@ namespace POS_Management_System.Controllers
             }
             return View(category);
         }
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -101,10 +88,6 @@ namespace POS_Management_System.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
-        }
-        private bool CategoryExists(int id)
-        {
-            return _context.Categories.Any(e => e.Id == id);
         }
     }
 }

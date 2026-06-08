@@ -60,20 +60,10 @@ namespace POS_Management_System.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(customer);
-                    await _context.SaveChangesAsync();
-                    TempData["Success"] = "Customer updated successfully!";
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CustomerExists(customer.Id))
-                    {
-                        return NotFound();
-                    }
-                    throw;
-                }
+                _context.Update(customer);
+               await _context.SaveChangesAsync();
+                TempData["Success"] = "Customer updated successfully!";
+              
                 return RedirectToAction(nameof(Index));
             }
             return View(customer);
@@ -105,9 +95,5 @@ namespace POS_Management_System.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CustomerExists(int id)
-        {
-            return _context.Customers.Any(e => e.Id == id);
-        }
     }
 }

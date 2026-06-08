@@ -77,8 +77,6 @@ namespace POS_Management_System.Controllers
             }
             if (ModelState.IsValid)
             {
-                try
-                {
                    if(ImageFile != null && ImageFile.Length > 0)
                     {
                         if (!string.IsNullOrEmpty(product.ImagePath))
@@ -105,15 +103,7 @@ namespace POS_Management_System.Controllers
                     _context.Update(product);
                     await _context.SaveChangesAsync();
                     TempData["Success"] = "Product Updated Successfully!";
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductExists(product.Id))
-                    {
-                        return NotFound();
-                    };
-                    throw;
-                }
+               
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name", product.CategoryId);
@@ -178,11 +168,6 @@ namespace POS_Management_System.Controllers
                 TempData["Success"] = "Stock updated successfully!";
             }
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.Id == id);
         }
 
     }
