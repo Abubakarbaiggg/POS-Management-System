@@ -60,34 +60,21 @@ namespace POS_Management_System.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(supplier);
-                    await _context.SaveChangesAsync();
-                    TempData["Success"] = "Supplier updated successfully!";
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!SupplierExists(supplier.Id))
-                    {
-                        return NotFound();
-                    }
-                    throw;
-                }
-                return RedirectToAction(nameof(Index));
+               _context.Update(supplier);
+               await _context.SaveChangesAsync();
+               TempData["Success"] = "Supplier updated successfully!";
+               return RedirectToAction(nameof(Index));
             }
             return View(supplier);
         }
 
         public async Task<IActionResult> Delete(int id)
         {
-            var supplier = await _context.Suppliers
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var supplier = await _context.Suppliers.FirstOrDefaultAsync(m => m.Id == id);
             if (supplier == null)
             {
                 return NotFound();
             }
-
             return View(supplier);
         }
 
@@ -105,9 +92,5 @@ namespace POS_Management_System.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool SupplierExists(int id)
-        {
-            return _context.Suppliers.Any(e => e.Id == id);
-        }
     }
 }

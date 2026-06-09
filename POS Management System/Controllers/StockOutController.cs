@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using POS_Management_System.Data;
@@ -8,41 +8,41 @@ using System.Text.Json;
 
 namespace POS_Management_System.Controllers
 {
-    public class StockInController : Controller
+    public class StockOutController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public StockInController(ApplicationDbContext context)
+        public StockOutController(ApplicationDbContext context)
         {
             _context = context;
         }
 
         public async Task<IActionResult> Index()
         {
-            var stockIns = await _context.StockIns
-                .Include(s => s.Supplier)
-                .Include(s => s.StockInDetails)
+            var stockOuts = await _context.StockOuts
+                .Include(s => s.Customer)
+                .Include(s => s.StockOutDetails)
                 .ThenInclude(d => d.Product)
                 .OrderByDescending(s => s.Date)
                 .ToListAsync();
-            return View(stockIns);
+            return View(stockOuts);
         }
 
         public async Task<IActionResult> Create()
         {
-            ViewBag.Suppliers = new SelectList(await _context.Suppliers.ToListAsync(), "Id", "Name");
+            ViewBag.Customers = new SelectList(await _context.Customers.ToListAsync(), "Id", "Name");
             ViewBag.Products = await _context.Products.ToListAsync();
 
-            return View(new StockInViewModel
+            return View(new StockOutViewModel
             {
                 Date = DateTime.Now,
-                Products = new List<StockInProductItem>()
+                Products = new List<StockOutProductItem>()
             });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(StockInViewModel model, string productsJson)
+        public async Task<IActionResult> Create(StockOutViewModel model, string productsJson)
         {
             if (string.IsNullOrEmpty(productsJson))
             {
@@ -51,7 +51,7 @@ namespace POS_Management_System.Controllers
                 return View(model);
             }
 
-            var products = JsonSerializer.Deserialize<List<StockInProductItem>>(productsJson,
+            var products = JsonSerializer.Deserialize<List<StockOutProductItem>>(productsJson,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             if (products == null || products.Count == 0)
@@ -63,8 +63,8 @@ namespace POS_Management_System.Controllers
 
             foreach (var item in products)
             {
-                var productExists = await _context.Products.AnyAsync(p => p.Id == item.ProductId);
-                if (!productExists)
+                var product = await _context.Products.FindAsync(item.ProductId);
+                if (product == null)
                 {
                     ModelState.AddModelError("", $"Product with ID {item.ProductId} does not exist in database");
                     await LoadViewBags(model);
@@ -78,9 +78,9 @@ namespace POS_Management_System.Controllers
                     return View(model);
                 }
 
-                if (item.PurchasePrice <= 0)
+                if (product.Quantity < item.Quantity)
                 {
-                    ModelState.AddModelError("", $"Purchase price must be greater than 0 for {item.ProductName}");
+                    ModelState.AddModelError("", $"Not enough stock for {item.ProductName}. Available: {product.Quantity}");
                     await LoadViewBags(model);
                     return View(model);
                 }
@@ -92,103 +92,104 @@ namespace POS_Management_System.Controllers
                 return View(model);
             }
 
-                decimal totalAmount = products.Sum(p => p.Total);
+            decimal totalAmount = products.Sum(p => p.Total);
 
-                var stockIn = new StockIn
+            var stockOut = new StockOut
+            {
+                CustomerId = model.CustomerId,
+                Date = model.Date
+            };
+
+            _context.StockOuts.Add(stockOut);
+            await _context.SaveChangesAsync();
+
+            foreach (var item in products)
+            {
+                var stockOutDetail = new StockOutDetail
                 {
-                    SupplierId = model.SupplierId,
-                    Date = model.Date
+                    StockOutId = stockOut.Id,
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPrice,
+                    Total = item.Total
                 };
+                _context.StockOutDetails.Add(stockOutDetail);
 
-                _context.StockIns.Add(stockIn);
-                await _context.SaveChangesAsync();
-
-                foreach (var item in products)
+                var product = await _context.Products.FindAsync(item.ProductId);
+                if (product != null)
                 {
-                    var stockInDetail = new StockInDetail
-                    {
-                        StockInId = stockIn.Id,
-                        ProductId = item.ProductId,
-                        Quantity = item.Quantity,
-                        PurchasePrice = item.PurchasePrice,
-                        Total = item.Total
-                    };
-                    _context.StockInDetails.Add(stockInDetail);
-
-                    var product = await _context.Products.FindAsync(item.ProductId);
-                    if (product != null)
-                    {
-                        product.Quantity += item.Quantity;
-                        _context.Update(product);
-                    }
+                    product.Quantity -= item.Quantity;
+                    _context.Update(product);
                 }
-
-                await _context.SaveChangesAsync();
-
-                TempData["Success"] = $"Stock In completed successfully! Total amount: {totalAmount:N2}";
-                return RedirectToAction(nameof(Index));
             }
-           
 
-        private async Task LoadViewBags(StockInViewModel model)
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Stock Out completed successfully! Total amount: {totalAmount:N2}";
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task LoadViewBags(StockOutViewModel model)
         {
-            ViewBag.Suppliers = new SelectList(await _context.Suppliers.ToListAsync(), "Id", "Name", model.SupplierId);
+            ViewBag.Customers = new SelectList(await _context.Customers.ToListAsync(), "Id", "Name", model.CustomerId);
             ViewBag.Products = await _context.Products.ToListAsync();
         }
+
         public async Task<IActionResult> Details(int id)
         {
-            var stockIn = await _context.StockIns
-                .Include(s => s.Supplier)
-                .Include(s => s.StockInDetails)
+            var stockOut = await _context.StockOuts
+                .Include(s => s.Customer)
+                .Include(s => s.StockOutDetails)
                 .ThenInclude(d => d.Product)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (stockIn == null)
+            if (stockOut == null)
             {
                 return NotFound();
             }
 
-            return View(stockIn);
+            return View(stockOut);
         }
+
         public async Task<IActionResult> Delete(int id)
         {
-            var stockIn = await _context.StockIns
-                .Include(s => s.Supplier)
-                .Include(s => s.StockInDetails)
+            var stockOut = await _context.StockOuts
+                .Include(s => s.Customer)
+                .Include(s => s.StockOutDetails)
                    .ThenInclude(d => d.Product)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (stockIn == null)
+            if (stockOut == null)
             {
                 return NotFound();
             }
 
-            return View(stockIn);
+            return View(stockOut);
         }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var stockIn = await _context.StockIns
-                .Include(s => s.StockInDetails)
+            var stockOut = await _context.StockOuts
+                .Include(s => s.StockOutDetails)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
-            if (stockIn != null)
+            if (stockOut != null)
             {
-                foreach (var detail in stockIn.StockInDetails!)
+                foreach (var detail in stockOut.StockOutDetails!)
                 {
                     var product = await _context.Products.FindAsync(detail.ProductId);
                     if (product != null)
                     {
-                        product.Quantity -= detail.Quantity;
+                        product.Quantity += detail.Quantity;
                         _context.Update(product);
                     }
                 }
 
-                _context.StockIns.Remove(stockIn);
+                _context.StockOuts.Remove(stockOut);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Stock In record deleted successfully!";
+                TempData["Success"] = "Stock Out record deleted successfully!";
             }
 
             return RedirectToAction(nameof(Index));

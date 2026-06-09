@@ -14,6 +14,8 @@ namespace POS_Management_System.Data
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<StockIn> StockIns { get; set; }
         public DbSet<StockInDetail> StockInDetails { get; set; }
+        public DbSet<StockOut> StockOuts { get; set; }
+        public DbSet<StockOutDetail> StockOutDetails { get; set; }
         public DbSet<Sale> Sales { get; set; }
         public DbSet<SaleDetail> SaleDetails { get; set; }
         public DbSet<Customer> Customers { get; set; }

@@ -1,0 +1,45 @@
+@model IEnumerable<POS_Management_System.Models.StockOut>
+
+@{
+    ViewData["Title"] = "Stock Outs";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Stock Outs</h4>
+        </div>
+        <div class="card-body">
+            <p>
+                <a asp-action="Create" class="btn btn-success">New Stock Out</a>
+            </p>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Total Items</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>@item.Date.ToShortDateString()</td>
+                            <td>@item.Customer?.Name</td>
+                            <td>@(item.StockOutDetails?.Sum(d => d.Quantity) ?? 0)</td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,51 @@
+@model POS_Management_System.Models.StockOut
+
+@{
+    ViewData["Title"] = "Stock Out Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Stock Out Details</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">ID</dt>
+                <dd class="col-sm-9">@Model.Id</dd>
+
+                <dt class="col-sm-3">Date</dt>
+                <dd class="col-sm-9">@Model.Date.ToShortDateString()</dd>
+
+                <dt class="col-sm-3">Customer</dt>
+                <dd class="col-sm-9">@Model.Customer?.Name</dd>
+            </dl>
+
+            <h5>Products</h5>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var d in Model.StockOutDetails)
+                    {
+                        <tr>
+                            <td>@d.Product?.Name</td>
+                            <td>@d.Quantity</td>
+                            <td>@d.UnitPrice.ToString("N2")</td>
+                            <td>@d.Total.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <a asp-action="Index" class="btn btn-secondary">Back</a>
+        </div>
+    </div>
+</div>
