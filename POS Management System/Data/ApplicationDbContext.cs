@@ -20,6 +20,7 @@ namespace POS_Management_System.Data
         public DbSet<SaleDetail> SaleDetails { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
 
     }
 }

@@ -1,0 +1,34 @@
+@model POS_Management_System.Models.ViewModels.UserPermissionsViewModel
+
+@{
+    ViewData["Title"] = "Manage Permissions";
+}
+
+<h2>Manage Permissions for @Model.UserName</h2>
+
+<form asp-action="UpdatePermissions" method="post">
+    <input type="hidden" asp-for="Id" />
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Permission</th>
+                <th>Granted</th>
+            </tr>
+        </thead>
+        <tbody>
+@for (int i = 0; i < Model.Permissions.Count; i++)
+{
+    <tr>
+        <td>@Model.Permissions[i].Name</td>
+        <td>
+            <input type="hidden" name="Permissions[@i].Name" value="@Model.Permissions[i].Name" />
+            <input type="checkbox" name="Permissions[@i].Selected" value="true" @(Model.Permissions[i].Selected ? "checked" : "") />
+        </td>
+    </tr>
+}
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Save Permissions</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
