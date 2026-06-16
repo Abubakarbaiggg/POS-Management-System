@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Create Role";
+}
+
+<h2>Create Role</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label for="name">Role Name</label>
+        <input id="name" name="name" class="form-control" />
+        <span class="text-danger" data-valmsg-for="name" data-valmsg-replace="true"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
