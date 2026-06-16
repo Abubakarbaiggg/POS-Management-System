@@ -4,6 +4,7 @@ namespace POS_Management_System.Models.ViewModels
 {
     public class PermissionItem
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public bool Selected { get; set; }
     }

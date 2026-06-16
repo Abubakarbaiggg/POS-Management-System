@@ -23,7 +23,7 @@
     <thead>
         <tr>
             <th>Name</th>
-            <th></th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -32,6 +32,7 @@
         <tr>
             <td>@role.Name</td>
             <td>
+                <a asp-action="ManagePermissions" asp-route-id="@role.Id" class="btn btn-sm btn-primary" title="Assign permissions to this role">Assign Permissions</a>
                 <a asp-action="Details" asp-route-id="@role.Id" class="btn btn-sm btn-info">Details</a>
                 <a asp-action="Edit" asp-route-id="@role.Id" class="btn btn-sm btn-warning">Edit</a>
                 <a asp-action="Delete" asp-route-id="@role.Id" class="btn btn-sm btn-danger">Delete</a>
