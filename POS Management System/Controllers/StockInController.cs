@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using POS_Management_System.Data;
@@ -8,6 +9,8 @@ using System.Text.Json;
 
 namespace POS_Management_System.Controllers
 {
+    [Authorize]
+
     public class StockInController : Controller
     {
         private readonly ApplicationDbContext _context;

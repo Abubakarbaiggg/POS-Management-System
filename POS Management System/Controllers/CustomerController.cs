@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using POS_Management_System.Data;
 using POS_Management_System.Models;
 
 namespace POS_Management_System.Controllers
 {
+    [Authorize]
+
     public class CustomerController : Controller
     {
         private readonly ApplicationDbContext _context;

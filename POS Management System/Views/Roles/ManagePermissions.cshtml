@@ -1,35 +1,63 @@
 @model POS_Management_System.Models.ViewModels.RolePermissionsViewModel
 
 @{
-    ViewData["Title"] = "Manage Role Permissions";
+    ViewData["Title"] = "Manage Permissions";
 }
 
-<h2>Manage Permissions for @Model.RoleName</h2>
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
 
-<form asp-action="UpdateRolePermissions" method="post" asp-antiforgery="true">
-    @Html.AntiForgeryToken()
-    <input type="hidden" name="roleId" value="@Model.RoleId" />
+        <div class="page-heading">
+            <div>
+                <h1 class="h3">Permissions - @Model.RoleName</h1>
+            </div>
+        </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Permission</th>
-                <th>Assigned</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var p in Model.Permissions)
-            {
-                <tr>
-                    <td>@p.Name</td>
-                    <td>
-                        <input type="checkbox" name="selectedPermissionIds" value="@p.Id" @(p.Selected ? "checked" : "") />
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+        <form asp-action="UpdateRolePermissions" method="post" class="panel">
 
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-</form>
+            <input type="hidden" name="roleId" value="@Model.RoleId" />
+
+            <div class="table-responsive p-3">
+
+                <table class="table">
+
+                    <thead>
+                        <tr>
+                            <th>Permission</th>
+                            <th>Assigned</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var p in Model.Permissions)
+                        {
+                            <tr>
+                                <td>@p.Name</td>
+                                <td>
+                                    <input type="checkbox"
+                                           name="selectedPermissionIds"
+                                           value="@p.Id"
+                                    @(p.Selected ? "checked" : "") />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 p-3 border-top">
+
+                <a asp-action="Index" class="btn btn-secondary">Back</a>
+
+                <button type="submit" class="btn btn-primary">
+                    Save Permissions
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</main>

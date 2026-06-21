@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +6,8 @@ using POS_Management_System.Data;
 
 namespace POS_Management_System.Controllers
 {
+    [Authorize]
+
     public class RolesController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -72,7 +75,7 @@ namespace POS_Management_System.Controllers
             var model = new POS_Management_System.Models.ViewModels.RolePermissionsViewModel
             {
                 RoleId = role.Id,
-                RoleName = role.Name,
+                RoleName = role.Name!,
                 Permissions = allPermissions.Select(p => new POS_Management_System.Models.ViewModels.PermissionItem { Id = p.Id, Name = p.Name, Selected = assigned.Contains(p.Id) }).ToList()
             };
 

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using POS_Management_System.Models;
@@ -5,6 +6,8 @@ using POS_Management_System.Models.ViewModels;
 
 namespace POS_Management_System.Controllers
 {
+    [Authorize]
+
     public class UsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

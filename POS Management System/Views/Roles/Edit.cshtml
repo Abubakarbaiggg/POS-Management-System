@@ -4,19 +4,35 @@
     ViewData["Title"] = "Edit Role";
 }
 
-<h2>Edit Role</h2>
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" />
-    <div class="form-group">
-        <label asp-for="Name">Role Name</label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+        <div class="page-heading">
+            <div>
+                <h1 class="h3">Edit Role</h1>
+            </div>
+        </div>
+
+        <form asp-action="Edit" method="post" class="panel">
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="p-3">
+
+                <label class="form-label">Role Name</label>
+                <input asp-for="Name" class="form-control" />
+
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 p-3 border-top">
+
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+
+            </div>
+
+        </form>
+
     </div>
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-</form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+</main>
