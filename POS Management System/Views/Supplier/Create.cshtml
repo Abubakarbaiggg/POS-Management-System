@@ -5,51 +5,96 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4>Create New Supplier</h4>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Create">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="Name" class="form-label">Supplier Name</label>
-                            <input asp-for="Name" class="form-control" placeholder="Enter supplier name" />
-                            <span asp-validation-for="Name" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="Phone" class="form-label">Phone Number</label>
-                            <input asp-for="Phone" class="form-control" placeholder="Enter phone number" />
-                            <span asp-validation-for="Phone" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="Email" class="form-label">Email (Optional)</label>
-                            <input asp-for="Email" class="form-control" placeholder="Enter email address" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="Address" class="form-label">Address (Optional)</label>
-                            <textarea asp-for="Address" class="form-control" rows="3" placeholder="Enter address"></textarea>
-                            <span asp-validation-for="Address" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <button type="submit" class="btn btn-primary">Create</button>
-                            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    </form>
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <!-- Page Heading -->
+        <div class="page-heading mb-4">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-person-plus" aria-hidden="true"></i>
+                </span>
+                <div>
+                    <p class="eyebrow mb-1">Management</p>
+                    <h1 class="h3 mb-1">Create Supplier</h1>
+                    <p class="text-muted mb-0">Add new supplier details into the system.</p>
                 </div>
             </div>
         </div>
+
+        <section class="row justify-content-center">
+
+            <div class="col-12 col-xl-6">
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <div>
+                            <h2 class="h5 mb-1 section-title">
+                                <i class="bi bi-truck"></i>
+                                <span>Supplier Information</span>
+                            </h2>
+                            <p class="text-muted mb-0">Fill all required fields carefully.</p>
+                        </div>
+                    </div>
+
+                    <form asp-action="Create" class="p-3">
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Supplier Name</label>
+                            <input asp-for="Name"
+                                   class="form-control form-control-lg"
+                                   placeholder="Enter supplier name" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="form-label">Phone Number</label>
+                            <input asp-for="Phone"
+                                   class="form-control form-control-lg"
+                                   placeholder="Enter phone number" />
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email (Optional)</label>
+                            <input asp-for="Email"
+                                   class="form-control form-control-lg"
+                                   placeholder="Enter email address" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label">Address (Optional)</label>
+                            <textarea asp-for="Address"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Enter address"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check2-circle"></i> Create Supplier
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </section>
+
     </div>
-</div>
+</main>
 
 @section Scripts {
     @{

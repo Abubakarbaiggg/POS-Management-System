@@ -2,56 +2,125 @@
 
 @{
     ViewData["Title"] = "Delete Product";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header bg-danger text-white">
-                    <h4>Delete Product</h4>
-                </div>
-                <div class="card-body">
-                    
-                    <dl class="row">
-                        <dt class="col-sm-4">Product Name</dt>
-                        <dd class="col-sm-8">@Model.Name</dd>
-                        
-                        <dt class="col-sm-4">Category</dt>
-                        <dd class="col-sm-8">@Model.Category?.Name</dd>
-                        
-                        <dt class="col-sm-4">Purchase Price</dt>
-                        <dd class="col-sm-8">@Model.PurchasePrice.ToString("N2")</dd>
-                        
-                        <dt class="col-sm-4">Sale Price</dt>
-                        <dd class="col-sm-8">@Model.SalePrice.ToString("N2")</dd>
-                        
-                        <dt class="col-sm-4">Current Stock</dt>
-                        <dd class="col-sm-8">
-                            <span class="badge @(Model.Quantity < 10 ? "bg-danger" : "bg-success")">
-                                @Model.Quantity units
-                            </span>
-                        </dd>
-                    </dl>
-                    
-                    @if (!string.IsNullOrEmpty(Model.ImagePath))
-                    {
-                        <div class="mb-3">
-                            <label>Product Image:</label>
-                            <div>
-                                <img src="@Model.ImagePath" width="150" style="object-fit: cover;" />
-                            </div>
-                        </div>
-                    }
-                    
-                    <form asp-action="Delete">
-                        <input type="hidden" asp-for="Id" />
-                        <button type="submit" class="btn btn-danger">Confirm Delete</button>
-                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-                    </form>
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <!-- Page Header -->
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-trash text-danger"></i>
+                </span>
+
+                <div>
+                    <p class="eyebrow mb-1">Danger Zone</p>
+                    <h1 class="h3 mb-1 text-danger">Delete Product</h1>
+                    <p class="text-muted mb-0">
+                        This action cannot be undone.
+                    </p>
                 </div>
             </div>
+
+            <div class="heading-actions">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
         </div>
+
+        <section class="row g-3 justify-content-center">
+
+            <div class="col-12 col-xl-6">
+
+                <div class="panel border-danger">
+
+                    <!-- Panel Header -->
+                    <div class="panel-header">
+                        <div>
+                            <h2 class="h5 mb-1 section-title text-danger">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                <span>Confirm Deletion</span>
+                            </h2>
+
+                            <p class="text-muted mb-0">
+                                Please review product details before deleting.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-3">
+
+                        <!-- Product Image -->
+                        @if (!string.IsNullOrEmpty(Model.ImagePath))
+                        {
+                            <div class="mb-3 text-center">
+                                <img src="@Model.ImagePath"
+                                     width="120"
+                                     height="120"
+                                     style="object-fit:cover;border-radius:10px;" />
+                            </div>
+                        }
+
+                        <!-- Warning -->
+                        <div class="alert alert-warning d-flex align-items-center gap-2">
+                            <i class="bi bi-info-circle"></i>
+                            <span>
+                                Deleting this product will remove it permanently from inventory.
+                            </span>
+                        </div>
+
+                        <!-- Details -->
+                        <dl class="row mb-0">
+
+                            <dt class="col-sm-5 text-muted">Product Name</dt>
+                            <dd class="col-sm-7 fw-semibold">@Model.Name</dd>
+
+                            <dt class="col-sm-5 text-muted">Category</dt>
+                            <dd class="col-sm-7">@Model.Category?.Name</dd>
+
+                            <dt class="col-sm-5 text-muted">Purchase Price</dt>
+                            <dd class="col-sm-7">@Model.PurchasePrice.ToString("N2")</dd>
+
+                            <dt class="col-sm-5 text-muted">Sale Price</dt>
+                            <dd class="col-sm-7">@Model.SalePrice.ToString("N2")</dd>
+
+                            <dt class="col-sm-5 text-muted">Stock</dt>
+                            <dd class="col-sm-7">
+                                <span class="badge @(Model.Quantity < 10 ? "text-bg-danger" : "text-bg-success")">
+                                    @Model.Quantity units
+                                </span>
+                            </dd>
+
+                        </dl>
+
+                    </div>
+
+                    <!-- Actions -->
+                    <form asp-action="Delete" method="post">
+
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="d-flex justify-content-end gap-2 p-3 border-top">
+
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Confirm Delete
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </section>
+
     </div>
-</div>
+</main>

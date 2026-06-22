@@ -5,47 +5,129 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4">
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Stock Out Details</h4>
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <!-- Page Heading -->
+        <div class="page-heading mb-4">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-receipt"></i>
+                </span>
+                <div>
+                    <p class="eyebrow mb-1">Sales</p>
+                    <h1 class="h3 mb-1">Stock Out Details</h1>
+                    <p class="text-muted mb-0">Complete sales transaction information.</p>
+                </div>
+            </div>
+
+            <div class="heading-actions">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    Back
+                </a>
+            </div>
         </div>
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-3">ID</dt>
-                <dd class="col-sm-9">@Model.Id</dd>
 
-                <dt class="col-sm-3">Date</dt>
-                <dd class="col-sm-9">@Model.Date.ToShortDateString()</dd>
+        <section class="row g-3">
 
-                <dt class="col-sm-3">Customer</dt>
-                <dd class="col-sm-9">@Model.Customer?.Name</dd>
-            </dl>
+            <!-- Customer Info -->
+            <div class="col-12 col-xl-4">
 
-            <h5>Products</h5>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Unit Price</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var d in Model.StockOutDetails)
-                    {
-                        <tr>
-                            <td>@d.Product?.Name</td>
-                            <td>@d.Quantity</td>
-                            <td>@d.UnitPrice.ToString("N2")</td>
-                            <td>@d.Total.ToString("N2")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                <div class="panel">
 
-            <a asp-action="Index" class="btn btn-secondary">Back</a>
-        </div>
+                    <div class="panel-header">
+                        <div>
+                            <h2 class="h5 mb-1 section-title">
+                                <i class="bi bi-person"></i>
+                                <span>Customer Info</span>
+                            </h2>
+                            <p class="text-muted mb-0">Sale recipient details</p>
+                        </div>
+                    </div>
+
+                    <div class="p-3">
+
+                        <dl class="row mb-0">
+
+                            <dt class="col-5">Stock ID</dt>
+                            <dd class="col-7 fw-semibold">#@Model.Id</dd>
+
+                            <dt class="col-5">Date</dt>
+                            <dd class="col-7">@Model.Date.ToString("yyyy-MM-dd")</dd>
+
+                            <dt class="col-5">Customer</dt>
+                            <dd class="col-7">@Model.Customer?.Name</dd>
+
+                        </dl>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Product Table -->
+            <div class="col-12 col-xl-8">
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <div>
+                            <h2 class="h5 mb-1 section-title">
+                                <i class="bi bi-box-seam"></i>
+                                <span>Sold Products</span>
+                            </h2>
+                            <p class="text-muted mb-0">Items included in this sale</p>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+
+                        <table class="table align-middle mb-0">
+
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Qty</th>
+                                    <th>Unit Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var d in Model.StockOutDetails)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">
+                                            @d.Product?.Name
+                                        </td>
+
+                                        <td>
+                                            <span class="badge bg-info text-dark">
+                                                @d.Quantity
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            @d.UnitPrice.ToString("N2")
+                                        </td>
+
+                                        <td class="fw-bold text-success">
+                                            @d.Total.ToString("N2")
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
     </div>
-</div>
+</main>

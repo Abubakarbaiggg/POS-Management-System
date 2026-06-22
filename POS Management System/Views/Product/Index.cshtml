@@ -2,69 +2,156 @@
 
 @{
     ViewData["Title"] = "Products";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4">
-    <div class="card">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Products</h4>
-            <a asp-action="Create" class="btn btn-light btn-sm">+ Add New Product</a>
-        </div>
-        <div class="card-body">
-            
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
 
-            <table class="table table-bordered table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Image</th>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Purchase Price</th>
-                        <th>Sale Price</th>
-                        <th>Stock</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>
-                                @if (!string.IsNullOrEmpty(item.ImagePath))
-                                {
-                                    <img src="@item.ImagePath" width="50" height="50" style="object-fit: cover;" />
-                                }
-                                else
-                                {
-                                    <img src="/images/no-image.png" width="50" height="50" style="object-fit: cover;" />
-                                }
-                            </td>
-                            <td>@item.Name</td>
-                            <td>@item.Category?.Name</td>
-                            <td>@item.PurchasePrice.ToString("N2")</td>
-                            <td>@item.SalePrice.ToString("N2")</td>
-                            <td>
-                                <span class="badge @(item.Quantity < 10 ? "bg-danger" : "bg-success")">
-                                    @item.Quantity
-                                </span>
-                            </td>
-                            <td>
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
-                                <a asp-action="Stock" asp-route-id="@item.Id" class="btn btn-sm btn-info">Stock</a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        <!-- Page Header -->
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-box-seam" aria-hidden="true"></i>
+                </span>
+
+                <div>
+                    <p class="eyebrow mb-1">Inventory</p>
+                    <h1 class="h3 mb-1">Products</h1>
+                    <p class="text-muted mb-0">Manage your product catalog and stock levels.</p>
+                </div>
+            </div>
+
+            <div class="heading-actions">
+                <a asp-action="Create" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle"></i> Add Product
+                </a>
+            </div>
         </div>
+
+        <!-- Success Message -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- Table Panel -->
+        <section class="panel">
+
+            <!-- Panel Header -->
+            <div class="panel-header d-flex justify-content-between align-items-center">
+
+                <div>
+                    <h2 class="h5 mb-1 section-title">
+                        <i class="bi bi-grid"></i>
+                        <span>Product List</span>
+                    </h2>
+                    <p class="text-muted mb-0">
+                        All products with pricing and stock status.
+                    </p>
+                </div>
+
+                <input class="form-control form-control-sm table-search"
+                       type="search"
+                       placeholder="Search products..."
+                       data-table-search="productTable" />
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+
+                <table class="table align-middle mb-0" id="productTable">
+
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Purchase</th>
+                            <th>Sale</th>
+                            <th>Stock</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <!-- Image -->
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.ImagePath))
+                                    {
+                                        <img src="@item.ImagePath"
+                                             width="45"
+                                             height="45"
+                                             style="object-fit:cover;border-radius:8px;" />
+                                    }
+                                    else
+                                    {
+                                        <img src="/images/no-image.png"
+                                             width="45"
+                                             height="45"
+                                             style="object-fit:cover;border-radius:8px;" />
+                                    }
+                                </td>
+
+                                <!-- Name -->
+                                <td class="fw-semibold">@item.Name</td>
+
+                                <!-- Category -->
+                                <td>@item.Category?.Name</td>
+
+                                <!-- Purchase -->
+                                <td>PKR @item.PurchasePrice.ToString("N2")</td>
+
+                                <!-- Sale -->
+                                <td>PKR @item.SalePrice.ToString("N2")</td>
+
+                                <!-- Stock -->
+                                <td>
+                                    <span class="badge @(item.Quantity < 10 ? "text-bg-danger" : "text-bg-success")">
+                                        @item.Quantity
+                                    </span>
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="text-end">
+
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-warning">
+                                        Edit
+                                    </a>
+
+                                    <a asp-action="Stock"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-info">
+                                        Stock
+                                    </a>
+
+                                    <a asp-action="Delete"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-danger">
+                                        Delete
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
     </div>
-</div>
+</main>

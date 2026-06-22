@@ -5,54 +5,94 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4">
-    <div class="card">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Stock In / Purchase History</h4>
-            <a asp-action="Create" class="btn btn-light btn-sm">+ New Stock In</a>
-        </div>
-        <div class="card-body">
-            
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <!-- Page Heading -->
+        <div class="page-heading mb-4">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-box-arrow-in-down" aria-hidden="true"></i>
+                </span>
+                <div>
+                    <p class="eyebrow mb-1">Inventory</p>
+                    <h1 class="h3 mb-1">Stock In History</h1>
+                    <p class="text-muted mb-0">Track all purchase and stock-in records from suppliers.</p>
                 </div>
-            }
+            </div>
+
+            <div class="heading-actions">
+                <a asp-action="Create" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle"></i> New Stock In
+                </a>
+            </div>
+        </div>
+
+        <!-- Table Panel -->
+        <section class="panel">
+
+            <div class="panel-header">
+                <div>
+                    <h2 class="h5 mb-1 section-title">
+                        <i class="bi bi-receipt"></i>
+                        <span>Purchase Records</span>
+                    </h2>
+                    <p class="text-muted mb-0">All stock-in transactions with supplier details.</p>
+                </div>
+            </div>
 
             <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-dark">
+                <table class="table align-middle mb-0">
+
+                    <thead>
                         <tr>
                             <th>ID</th>
                             <th>Date</th>
                             <th>Supplier</th>
                             <th>Products</th>
                             <th>Total Amount</th>
-                            <th>Actions</th>
+                            <th class="text-end">Actions</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         @foreach (var item in Model)
                         {
                             var total = item.StockInDetails?.Sum(d => d.Total) ?? 0;
                             var productCount = item.StockInDetails?.Count ?? 0;
+
                             <tr>
-                                <td>@item.Id</td>
+                                <td class="fw-semibold">#@item.Id</td>
                                 <td>@item.Date.ToString("yyyy-MM-dd")</td>
                                 <td>@item.Supplier?.Name</td>
-                                <td>@productCount item(s)</td>
-                                <td>@total.ToString("N2")</td>
                                 <td>
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
-                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                                    <span class="badge bg-secondary">
+                                        @productCount item(s)
+                                    </span>
+                                </td>
+                                <td class="fw-semibold">@total.ToString("N2")</td>
+
+                                <td class="text-end">
+                                    <a asp-action="Details"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-info">
+                                        Details
+                                    </a>
+
+                                    <a asp-action="Delete"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-danger">
+                                        Delete
+                                    </a>
                                 </td>
                             </tr>
                         }
                     </tbody>
+
                 </table>
             </div>
-        </div>
+
+        </section>
+
     </div>
-</div>
+</main>

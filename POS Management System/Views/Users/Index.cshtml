@@ -2,45 +2,94 @@
 
 @{
     ViewData["Title"] = "Users";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Users</h2>
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create New User</a>
-</p>
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon"><i class="bi bi-people"></i></span>
+                <div>
+                    <p class="eyebrow mb-1">Administration</p>
+                    <h1 class="h3 mb-1">Users</h1>
+                    <p class="text-muted mb-0">Manage system users and access control.</p>
+                </div>
+            </div>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
+            <div class="heading-actions">
+                <a asp-action="Create" class="btn btn-primary btn-sm">
+                    <i class="bi bi-person-plus"></i> Create User
+                </a>
+            </div>
+        </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var user in Model)
-{
-        <tr>
-            <td>@user.UserName</td>
-            <td>@user.Email</td>
-            <td>@user.PhoneNumber</td>
-            <td>
-                <a asp-action="Details" asp-route-id="@user.Id" class="btn btn-sm btn-info">Details</a>
-                <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-warning">Edit</a>
-                <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-sm btn-danger">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <section class="panel">
+
+            <div class="panel-header">
+                <div>
+                    <h2 class="h5 mb-1 section-title">
+                        <i class="bi bi-table"></i>
+                        <span>Users List</span>
+                    </h2>
+                    <p class="text-muted mb-0">All registered users in system.</p>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@user.UserName</td>
+                                <td>@user.Email</td>
+                                <td>@user.PhoneNumber</td>
+                                <td class="text-end">
+                                    <a asp-action="Details" asp-route-id="@user.Id" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+        </section>
+
+    </div>
+</main>

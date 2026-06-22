@@ -2,36 +2,71 @@
 
 @{
     ViewData["Title"] = "User Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>User Details</h2>
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
 
-<div>
-    <h4>User</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            Username
-        </dt>
-        <dd class = "col-sm-10">
-            @Model.UserName
-        </dd>
-        <dt class = "col-sm-2">
-            Email
-        </dt>
-        <dd class = "col-sm-10">
-            @Model.Email
-        </dd>
-        <dt class = "col-sm-2">
-            Phone
-        </dt>
-        <dd class = "col-sm-10">
-            @Model.PhoneNumber
-        </dd>
-    </dl>
-</div>
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon"><i class="bi bi-person-badge"></i></span>
+                <div>
+                    <p class="eyebrow mb-1">User Management</p>
+                    <h1 class="h3 mb-1">User Details</h1>
+                    <p class="text-muted mb-0">View complete user account information.</p>
+                </div>
+            </div>
+        </div>
 
-<p>
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-</p>
+        <section class="panel">
+
+            <div class="panel-header">
+                <div>
+                    <h2 class="h5 mb-1 section-title">
+                        <i class="bi bi-person-lines-fill"></i>
+                        <span>Profile Information</span>
+                    </h2>
+                    <p class="text-muted mb-0">User account overview.</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+
+                <div class="col-md-6">
+                    <div class="panel h-100">
+
+                        <dl class="row mb-0">
+
+                            <dt class="col-4">Username</dt>
+                            <dd class="col-8">@Model.UserName</dd>
+
+                            <dt class="col-4">Email</dt>
+                            <dd class="col-8">@Model.Email</dd>
+
+                            <dt class="col-4">Phone</dt>
+                            <dd class="col-8">@Model.PhoneNumber</dd>
+
+                        </dl>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    Back
+                </a>
+
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> Edit User
+                </a>
+
+            </div>
+
+        </section>
+
+    </div>
+</main>
