@@ -125,4 +125,98 @@
 
         </section>
     </div>
+    <script>
+                @section Scripts {
+                <script>
+                        let products = [];
+
+                        document.getElementById("addProductBtn").addEventListener("click", function () {
+
+                            let productSelect = document.getElementById("productSelect");
+                            let quantity = parseInt(document.getElementById("quantity").value);
+                            let price = parseFloat(document.getElementById("price").value);
+
+                            if (!productSelect.value) {
+                                alert("Please select a product");
+                                return;
+                            }
+
+                            if (!quantity || quantity <= 0) {
+                                alert("Enter valid quantity");
+                                return;
+                            }
+
+                            if (!price || price <= 0) {
+                                alert("Enter valid price");
+                                return;
+                            }
+
+                            let productId = parseInt(productSelect.value);
+                            let productName =
+                                productSelect.options[productSelect.selectedIndex].dataset.name;
+
+                            let total = quantity * price;
+
+                            let item = {
+                                productId: productId,
+                                productName: productName,
+                                quantity: quantity,
+                                purchasePrice: price,
+                                total: total
+                            };
+
+                            products.push(item);
+
+                            renderTable();
+
+                            document.getElementById("productsJson").value =
+                                JSON.stringify(products);
+
+                            document.getElementById("quantity").value = "";
+                            document.getElementById("price").value = "";
+                            document.getElementById("productSelect").selectedIndex = 0;
+                        });
+
+                        function renderTable() {
+
+                            let tbody = document.getElementById("productsTableBody");
+                            tbody.innerHTML = "";
+
+                            let grandTotal = 0;
+
+                            products.forEach((item, index) => {
+
+                                grandTotal += item.total;
+
+                                tbody.innerHTML += `
+                                    <tr>
+                                        <td>${item.productName}</td>
+                                        <td>${item.quantity}</td>
+                                        <td>${item.purchasePrice.toFixed(2)}</td>
+                                        <td>${item.total.toFixed(2)}</td>
+                                        <td class="text-end">
+                                            <button type="button"
+                                                    class="btn btn-danger btn-sm"
+                                                    onclick="removeProduct(${index})">
+                                                Remove
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+
+                            document.getElementById("grandTotal").innerText =
+                                grandTotal.toFixed(2);
+
+                            document.getElementById("productsJson").value =
+                                JSON.stringify(products);
+                        }
+
+                        function removeProduct(index) {
+                            products.splice(index, 1);
+                            renderTable();
+                        }
+            </script>
+        }
+    </script>
 </main>
