@@ -7,32 +7,137 @@
 <main class="dashboard-content">
     <div class="container-fluid px-3 px-lg-4 py-4">
 
+        <!-- Page Header -->
         <div class="page-heading">
-            <div>
-                <h1 class="h3">Edit Role</h1>
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-shield-lock" aria-hidden="true"></i>
+                </span>
+
+                <div>
+                    <p class="eyebrow mb-1">User Management</p>
+                    <h1 class="h3 mb-1">Edit Role</h1>
+                    <p class="text-muted mb-0">
+                        Update role information and save your changes.
+                    </p>
+                </div>
+            </div>
+
+            <div class="heading-actions">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
             </div>
         </div>
 
-        <form asp-action="Edit" method="post" class="panel">
+        <section class="row g-3">
 
-            <input type="hidden" asp-for="Id" />
+            <!-- Form Section -->
+            <div class="col-12 col-xl-8">
 
-            <div class="p-3">
+                <form asp-action="Edit" method="post" class="panel">
 
-                <label class="form-label">Role Name</label>
-                <input asp-for="Name" class="form-control" />
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="panel-header">
+                        <div>
+                            <h2 class="h5 mb-1 section-title">
+                                <i class="bi bi-pencil-square"></i>
+                                <span>Role Information</span>
+                            </h2>
+                            <p class="text-muted mb-0">
+                                Modify role details below.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-3">
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">
+                                Role Name
+                            </label>
+
+                            <input asp-for="Name"
+                                   class="form-control"
+                                   placeholder="Enter role name" />
+
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 p-3 border-top">
+
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-save"></i> Save Changes
+                        </button>
+
+                    </div>
+
+                </form>
 
             </div>
 
-            <div class="d-flex justify-content-end gap-2 p-3 border-top">
+            <!-- Side Information Panel -->
+            <div class="col-12 col-xl-4">
 
-                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                <div class="panel h-100">
 
-                <button type="submit" class="btn btn-primary">Save</button>
+                    <h2 class="h5 mb-3 section-title">
+                        <i class="bi bi-lightbulb"></i>
+                        <span>Tips</span>
+                    </h2>
+
+                    <div class="activity-list">
+
+                        <div class="activity-item">
+                            <span class="activity-dot bg-success"></span>
+                            <div>
+                                <p class="mb-1 fw-semibold">Role Naming</p>
+                                <p class="text-muted small mb-0">
+                                    Use clear and meaningful role names.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <span class="activity-dot bg-primary"></span>
+                            <div>
+                                <p class="mb-1 fw-semibold">Permissions</p>
+                                <p class="text-muted small mb-0">
+                                    Ensure users have appropriate access levels.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <span class="activity-dot bg-warning"></span>
+                            <div>
+                                <p class="mb-1 fw-semibold">Impact</p>
+                                <p class="text-muted small mb-0">
+                                    Changes may affect users assigned to this role.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 
-        </form>
+        </section>
 
     </div>
 </main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

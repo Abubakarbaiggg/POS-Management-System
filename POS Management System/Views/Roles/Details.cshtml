@@ -7,29 +7,126 @@
 <main class="dashboard-content">
     <div class="container-fluid px-3 px-lg-4 py-4">
 
+        <!-- PAGE HEADER -->
         <div class="page-heading">
-            <div>
-                <h1 class="h3">Role Details</h1>
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-person-badge" aria-hidden="true"></i>
+                </span>
+
+                <div>
+                    <p class="eyebrow mb-1">User Management</p>
+                    <h1 class="h3 mb-1">Role Details</h1>
+                    <p class="text-muted mb-0">
+                        View complete role information.
+                    </p>
+                </div>
+            </div>
+
+            <div class="heading-actions d-flex gap-2">
+
+                <a asp-action="Edit"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-warning btn-sm">
+                    <i class="bi bi-pencil-square"></i> Edit
+                </a>
+
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+
             </div>
         </div>
 
-        <div class="panel p-3">
+        <section class="row g-3">
 
-            <p><strong>Name:</strong> @Model.Name</p>
+            <!-- DETAILS CARD -->
+            <div class="col-12 col-xl-8">
 
-            <div class="d-flex gap-2 mt-3">
+                <div class="panel">
 
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
-                    Edit
-                </a>
+                    <div class="panel-header">
+                        <div>
+                            <h2 class="h5 mb-1 section-title">
+                                <i class="bi bi-info-circle"></i>
+                                <span>Role Information</span>
+                            </h2>
+                            <p class="text-muted mb-0">
+                                Basic details of selected role.
+                            </p>
+                        </div>
+                    </div>
 
-                <a asp-action="Index" class="btn btn-secondary">
-                    Back
-                </a>
+                    <dl class="row mb-0 p-3">
+
+                        <dt class="col-sm-3 text-muted">Role ID</dt>
+                        <dd class="col-sm-9 fw-semibold">
+                            @Model.Id
+                        </dd>
+
+                        <hr />
+
+                        <dt class="col-sm-3 text-muted">Role Name</dt>
+                        <dd class="col-sm-9 fw-semibold">
+                            @Model.Name
+                        </dd>
+
+                    </dl>
+
+                </div>
 
             </div>
 
-        </div>
+            <!-- SIDE INFO PANEL -->
+            <div class="col-12 col-xl-4">
+
+                <div class="panel h-100">
+
+                    <h2 class="h5 mb-3 section-title">
+                        <i class="bi bi-shield-lock"></i>
+                        <span>Role Information</span>
+                    </h2>
+
+                    <div class="activity-list">
+
+                        <div class="activity-item">
+                            <span class="activity-dot bg-primary"></span>
+                            <div>
+                                <p class="mb-1 fw-semibold">Role ID</p>
+                                <p class="text-muted small mb-0">
+                                    Unique identifier used by the system.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <span class="activity-dot bg-success"></span>
+                            <div>
+                                <p class="mb-1 fw-semibold">User Access</p>
+                                <p class="text-muted small mb-0">
+                                    Roles define user permissions and access levels.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <span class="activity-dot bg-warning"></span>
+                            <div>
+                                <p class="mb-1 fw-semibold">Security</p>
+                                <p class="text-muted small mb-0">
+                                    Changes may affect users assigned to this role.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
 
     </div>
 </main>
