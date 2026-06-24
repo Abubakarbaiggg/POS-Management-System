@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using POS_Management_System.Models;
 using POS_Management_System.Models.ViewModels;
-
+using Microsoft.AspNetCore.Mvc.Rendering;
 namespace POS_Management_System.Controllers
 {
     [Authorize]
@@ -11,10 +11,13 @@ namespace POS_Management_System.Controllers
     public class UsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UsersController(UserManager<ApplicationUser> userManager)
+
+        public UsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public IActionResult Index()
@@ -135,6 +138,61 @@ namespace POS_Management_System.Controllers
             {
                 TempData["Error"] = string.Join("; ", result.Errors.Select(e => e.Description));
             }
+
+            return RedirectToAction(nameof(Index));
+        }
+        public async Task<IActionResult> AssignRole(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return NotFound();
+
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user == null)
+                return NotFound();
+
+            var roles = _roleManager.Roles
+                .Select(r => new SelectListItem
+                {
+                    Value = r.Name,
+                    Text = r.Name
+                }).ToList();
+
+            var currentRole = (await _userManager.GetRolesAsync(user))
+                .FirstOrDefault();
+
+            var model = new AssignRoleViewModel
+            {
+                UserId = user.Id,
+                UserName = user.UserName,
+                SelectedRole = currentRole,
+                Roles = roles
+            };
+
+            return View(model);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignRole(AssignRoleViewModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+
+            if (user == null)
+                return NotFound();
+
+            var existingRoles = await _userManager.GetRolesAsync(user);
+
+            if (existingRoles.Any())
+            {
+                await _userManager.RemoveFromRolesAsync(user, existingRoles);
+            }
+
+            if (!string.IsNullOrEmpty(model.SelectedRole))
+            {
+                await _userManager.AddToRoleAsync(user, model.SelectedRole);
+            }
+
+            TempData["Success"] = "Role assigned successfully.";
 
             return RedirectToAction(nameof(Index));
         }
