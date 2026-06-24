@@ -1,3 +1,4 @@
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -5,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using POS_Management_System.Data;
 using POS_Management_System.Models;
 using POS_Management_System.Models.ViewModels;
+using POS_Management_System.Services.Email;
 using System.Text.Json;
 
 namespace POS_Management_System.Controllers
@@ -122,6 +124,15 @@ namespace POS_Management_System.Controllers
                 if (product != null)
                 {
                     product.Quantity -= item.Quantity;
+
+                    if (product.Quantity <= 5)
+                    {
+                        BackgroundJob.Enqueue<IEmailService>(
+                            x => x.SendLowStockAlertAsync(
+                                product.Name,
+                                product.Quantity
+                            ));
+                    }
                     _context.Update(product);
                 }
             }

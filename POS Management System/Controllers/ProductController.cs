@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using POS_Management_System.Data;
 using POS_Management_System.Models;
+using POS_Management_System.Services.Email;
+using Hangfire;
 
 namespace POS_Management_System.Controllers
 {
