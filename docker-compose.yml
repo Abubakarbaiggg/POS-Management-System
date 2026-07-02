@@ -13,6 +13,34 @@ services:
     networks:
       - webnet
     restart: unless-stopped
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: posdb
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Your_strong_P@ssw0rd
+    ports:
+      - "1433:1433"
+    volumes:
+      - dbdata:/var/opt/mssql
+      - ./POSManagementSystem.sql:/scripts/POSManagementSystem.sql:ro
+    networks:
+      - webnet
+    restart: unless-stopped
+
+  db-init:
+    image: mcr.microsoft.com/mssql-tools
+    container_name: posdb-init
+    depends_on:
+      - db
+    volumes:
+      - ./POSManagementSystem.sql:/scripts/POSManagementSystem.sql:ro
+    environment:
+      - SA_PASSWORD=Your_strong_P@ssw0rd
+    entrypoint: ["/bin/bash","-c","until /opt/mssql-tools/bin/sqlcmd -S db -U SA -P \"$SA_PASSWORD\" -Q 'SELECT 1' >/dev/null 2>&1; do echo waiting for db; sleep 1; done; echo running init script; /opt/mssql-tools/bin/sqlcmd -S db -U SA -P \"$SA_PASSWORD\" -i /scripts/POSManagementSystem.sql"]
+    restart: "no"
+    networks:
+      - webnet
 
   nginx:
     image: nginx:stable-alpine
