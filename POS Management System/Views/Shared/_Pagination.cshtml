@@ -1,0 +1,40 @@
+﻿@model dynamic
+
+<nav class="mt-3">
+    <ul class="pagination justify-content-end">
+
+        @if (Model.HasPreviousPage)
+        {
+            <li class="page-item">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(Model.PageIndex - 1)">
+                    Previous
+                </a>
+            </li>
+        }
+
+        @for (int p = 1; p <= Model.TotalPages; p++)
+        {
+            <li class="page-item @(p == Model.PageIndex ? "active" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@p">
+                    @p
+                </a>
+            </li>
+        }
+
+        @if (Model.HasNextPage)
+        {
+            <li class="page-item">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(Model.PageIndex + 1)">
+                    Next
+                </a>
+            </li>
+        }
+
+    </ul>
+</nav>

@@ -1,4 +1,4 @@
-@model IEnumerable<POS_Management_System.Models.Permission>
+@model POS_Management_System.Helpers.PaginatedList<POS_Management_System.Models.Permission>
 
 @{
     ViewData["Title"] = "Permissions";
@@ -81,12 +81,14 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @{
+                            int i = 1;
+                        }
 
                         @foreach (var permission in Model)
                         {
                             <tr>
-                                <td>@permission.Id</td>
-
+                                <td>@i</td>
                                 <td class="fw-semibold">@permission.Name</td>
                                 <td class="text-end">
                                     <a asp-action="Details" asp-route-id="@permission.Id"
@@ -107,9 +109,12 @@
                                     </a>
                                 </td>
                             </tr>
+                            i++;
                         }
                     </tbody>
                 </table>
+                <partial name="_Pagination" model="Model" />
+
             </div>
         </section>
 

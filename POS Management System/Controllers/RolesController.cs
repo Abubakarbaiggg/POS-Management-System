@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using POS_Management_System.Data;
+using System.Data;
+using System.Security.Claims;
+using POS_Management_System.Models;
+using POS_Management_System.Models.ViewModels;
 
 namespace POS_Management_System.Controllers
 {
@@ -72,15 +76,16 @@ namespace POS_Management_System.Controllers
             var allPermissions = await _context.Permissions.OrderBy(p => p.Name).ToListAsync();
             var assigned = await _context.RolePermissions.Where(rp => rp.RoleId == id).Select(rp => rp.PermissionId).ToListAsync();
 
-            var model = new POS_Management_System.Models.ViewModels.RolePermissionsViewModel
+            var model = new RolePermissionsViewModel
             {
                 RoleId = role.Id,
                 RoleName = role.Name!,
-                Permissions = allPermissions.Select(p => new POS_Management_System.Models.ViewModels.PermissionItem { Id = p.Id, Name = p.Name, Selected = assigned.Contains(p.Id) }).ToList()
+                Permissions = allPermissions.Select(p => new PermissionItem { Id = p.Id, Name = p.Name, Selected = assigned.Contains(p.Id) }).ToList()
             };
 
             return View(model);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -101,8 +106,10 @@ namespace POS_Management_System.Controllers
             {
                 foreach (var pid in selectedPermissionIds.Distinct())
                 {
-                    _context.RolePermissions.Add(new POS_Management_System.Models.RolePermission { RoleId = roleId, PermissionId = pid });
+                    _context.RolePermissions.Add(new RolePermission { RoleId = roleId, PermissionId = pid });
                 }
+                ;
+
             }
 
             await _context.SaveChangesAsync();
@@ -189,7 +196,7 @@ namespace POS_Management_System.Controllers
             {
                 TempData["Error"] = string.Join("; ", result.Errors.Select(e => e.Description));
             }
-
+                
             return RedirectToAction(nameof(Index));
         }
     }

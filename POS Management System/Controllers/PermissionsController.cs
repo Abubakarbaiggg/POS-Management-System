@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using POS_Management_System.Data;
 using POS_Management_System.Models;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using POS_Management_System.Helpers;
 
 namespace POS_Management_System.Controllers
 {
@@ -12,14 +15,20 @@ namespace POS_Management_System.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public PermissionsController(ApplicationDbContext context)
+        private readonly RoleManager<IdentityRole> _roleManager;
+
+        public PermissionsController(ApplicationDbContext context, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
+            _roleManager = roleManager;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page=1)
         {
-            var perms = await _context.Permissions.OrderBy(p => p.Name).ToListAsync();
+            int pageSize = 10;
+            var perms = await PaginatedList<Permission>.CreateAsync(
+                _context.Permissions.OrderBy(p => p.Name),
+                page,pageSize);
             return View(perms);
         }
 

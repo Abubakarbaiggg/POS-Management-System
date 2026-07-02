@@ -23,5 +23,7 @@ namespace POS_Management_System.Data
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
 
+        public DbSet<Payment> Payments { get; set; }
+
     }
 }

@@ -16,10 +16,14 @@ namespace POS_Management_System.Controllers
     public class StockOutController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly Hangfire.IBackgroundJobClient _backgroundJobs;
+        private readonly Microsoft.Extensions.Logging.ILogger<StockOutController> _logger;
 
-        public StockOutController(ApplicationDbContext context)
+        public StockOutController(ApplicationDbContext context, Hangfire.IBackgroundJobClient backgroundJobs, Microsoft.Extensions.Logging.ILogger<StockOutController> logger)
         {
             _context = context;
+            _backgroundJobs = backgroundJobs;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
@@ -49,15 +53,40 @@ namespace POS_Management_System.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(StockOutViewModel model, string productsJson)
         {
+            // Log incoming form and productsJson for diagnostics
+            try
+            {
+                _logger?.LogInformation("StockOut Create POST called. productsJson present: {HasProductsJson}", !string.IsNullOrEmpty(productsJson));
+                foreach (var item in Request.Form)
+                {
+                    _logger?.LogDebug("Form field: {Key} = {Value}", item.Key, item.Value.ToString());
+                }
+                _logger?.LogDebug("Raw productsJson: {ProductsJson}", productsJson);
+            }
+            catch { }
+
             if (string.IsNullOrEmpty(productsJson))
             {
                 ModelState.AddModelError("", "Please add at least one product");
                 await LoadViewBags(model);
+                _logger?.LogWarning("Create aborted: productsJson empty or null. ModelState: {@ModelState}", ModelState);
                 return View(model);
             }
 
-            var products = JsonSerializer.Deserialize<List<StockOutProductItem>>(productsJson,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            List<StockOutProductItem>? products = null;
+            try
+            {
+                products = JsonSerializer.Deserialize<List<StockOutProductItem>>(productsJson,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                _logger?.LogInformation("Deserialized products count: {Count}", products == null ? 0 : products.Count);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Failed to deserialize productsJson: {ProductsJson}", productsJson);
+                ModelState.AddModelError("", "Invalid products data");
+                await LoadViewBags(model);
+                return View(model);
+            }
 
             if (products == null || products.Count == 0)
             {
@@ -98,6 +127,7 @@ namespace POS_Management_System.Controllers
             }
 
             decimal totalAmount = products.Sum(p => p.Total);
+         
 
             var stockOut = new StockOut
             {
@@ -106,7 +136,28 @@ namespace POS_Management_System.Controllers
             };
 
             _context.StockOuts.Add(stockOut);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Failed to save StockOut entity to database. StockOut: {@StockOut}", stockOut);
+                ModelState.AddModelError("", "An error occurred while saving the stock out. Please try again.");
+                await LoadViewBags(model);
+                return View(model);
+            }
+
+            var payment = new Payment
+            {
+                StockOutId = stockOut.Id,
+                TotalAmount = totalAmount,
+                PaidAmount = model.PaidAmount,
+                RemainingAmount = totalAmount - model.PaidAmount,
+                PaymentMethod = model.PaymentMethod
+            };
+
+            //_context.Payments.Add(payment);
 
             foreach (var item in products)
             {
@@ -127,17 +178,35 @@ namespace POS_Management_System.Controllers
 
                     if (product.Quantity <= 5)
                     {
-                        BackgroundJob.Enqueue<IEmailService>(
-                            x => x.SendLowStockAlertAsync(
-                                product.Name,
-                                product.Quantity
-                            ));
+                        try
+                        {
+                            var jobId = _backgroundJobs.Enqueue<IEmailService>(
+                                x => x.SendLowStockAlertAsync(
+                                    product.Name,
+                                    product.Quantity
+                                ));
+                            _logger?.LogInformation("Enqueued low stock email job {JobId} for product {Product} (stock {Stock})", jobId, product.Name, product.Quantity);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger?.LogError(ex, "Failed to enqueue Hangfire job for low stock alert for product {Product}", product.Name);
+                        }
                     }
                     _context.Update(product);
                 }
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Failed to save StockOut details/products to database. StockOutId: {Id}", stockOut.Id);
+                ModelState.AddModelError("", "An error occurred while saving the stock out details. Please try again.");
+                await LoadViewBags(model);
+                return View(model);
+            }
 
             TempData["Success"] = $"Stock Out completed successfully! Total amount: {totalAmount:N2}";
             return RedirectToAction(nameof(Index));

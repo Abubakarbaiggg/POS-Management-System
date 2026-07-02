@@ -49,7 +49,7 @@ namespace POS_Management_System.Controllers
                 return NotFound();
             }
             return View(category);
-        }
+        }   
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult>Edit(int id, Category category)
