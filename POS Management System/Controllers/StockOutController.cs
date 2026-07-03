@@ -17,13 +17,10 @@ namespace POS_Management_System.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly Hangfire.IBackgroundJobClient _backgroundJobs;
-        private readonly Microsoft.Extensions.Logging.ILogger<StockOutController> _logger;
-
-        public StockOutController(ApplicationDbContext context, Hangfire.IBackgroundJobClient backgroundJobs, Microsoft.Extensions.Logging.ILogger<StockOutController> logger)
+        public StockOutController(ApplicationDbContext context, Hangfire.IBackgroundJobClient backgroundJobs)
         {
             _context = context;
             _backgroundJobs = backgroundJobs;
-            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
@@ -53,77 +50,19 @@ namespace POS_Management_System.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(StockOutViewModel model, string productsJson)
         {
-            // Log incoming form and productsJson for diagnostics
-            try
-            {
-                _logger?.LogInformation("StockOut Create POST called. productsJson present: {HasProductsJson}", !string.IsNullOrEmpty(productsJson));
-                foreach (var item in Request.Form)
-                {
-                    _logger?.LogDebug("Form field: {Key} = {Value}", item.Key, item.Value.ToString());
-                }
-                _logger?.LogDebug("Raw productsJson: {ProductsJson}", productsJson);
-            }
-            catch { }
+           
+            var products = GetProducts(productsJson);
 
-            if (string.IsNullOrEmpty(productsJson))
+            if (products == null || !products.Any())
             {
-                ModelState.AddModelError("", "Please add at least one product");
-                await LoadViewBags(model);
-                _logger?.LogWarning("Create aborted: productsJson empty or null. ModelState: {@ModelState}", ModelState);
-                return View(model);
+                return await ReturnWithError(model, "Please add at least one product");
             }
 
-            List<StockOutProductItem>? products = null;
-            try
+            var validationError = await ValidateProducts(products);
+            
+            if (validationError != null)
             {
-                products = JsonSerializer.Deserialize<List<StockOutProductItem>>(productsJson,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                _logger?.LogInformation("Deserialized products count: {Count}", products == null ? 0 : products.Count);
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "Failed to deserialize productsJson: {ProductsJson}", productsJson);
-                ModelState.AddModelError("", "Invalid products data");
-                await LoadViewBags(model);
-                return View(model);
-            }
-
-            if (products == null || products.Count == 0)
-            {
-                ModelState.AddModelError("", "Please add at least one product");
-                await LoadViewBags(model);
-                return View(model);
-            }
-
-            foreach (var item in products)
-            {
-                var product = await _context.Products.FindAsync(item.ProductId);
-                if (product == null)
-                {
-                    ModelState.AddModelError("", $"Product with ID {item.ProductId} does not exist in database");
-                    await LoadViewBags(model);
-                    return View(model);
-                }
-
-                if (item.Quantity <= 0)
-                {
-                    ModelState.AddModelError("", $"Quantity must be greater than 0 for {item.ProductName}");
-                    await LoadViewBags(model);
-                    return View(model);
-                }
-
-                if (product.Quantity < item.Quantity)
-                {
-                    ModelState.AddModelError("", $"Not enough stock for {item.ProductName}. Available: {product.Quantity}");
-                    await LoadViewBags(model);
-                    return View(model);
-                }
-            }
-
-            if (!ModelState.IsValid)
-            {
-                await LoadViewBags(model);
-                return View(model);
+                return await ReturnWithError(model, validationError);
             }
 
             decimal totalAmount = products.Sum(p => p.Total);
@@ -136,17 +75,8 @@ namespace POS_Management_System.Controllers
             };
 
             _context.StockOuts.Add(stockOut);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "Failed to save StockOut entity to database. StockOut: {@StockOut}", stockOut);
-                ModelState.AddModelError("", "An error occurred while saving the stock out. Please try again.");
-                await LoadViewBags(model);
-                return View(model);
-            }
+         
+            await _context.SaveChangesAsync();
 
             var payment = new Payment
             {
@@ -157,61 +87,81 @@ namespace POS_Management_System.Controllers
                 PaymentMethod = model.PaymentMethod
             };
 
-            //_context.Payments.Add(payment);
 
-            foreach (var item in products)
-            {
-                var stockOutDetail = new StockOutDetail
-                {
-                    StockOutId = stockOut.Id,
-                    ProductId = item.ProductId,
-                    Quantity = item.Quantity,
-                    UnitPrice = item.UnitPrice,
-                    Total = item.Total
-                };
-                _context.StockOutDetails.Add(stockOutDetail);
+            _context.Payments.Add(payment);
 
-                var product = await _context.Products.FindAsync(item.ProductId);
-                if (product != null)
-                {
-                    product.Quantity -= item.Quantity;
+            await SaveStockOutDetails(stockOut.Id, products);
 
-                    if (product.Quantity <= 5)
-                    {
-                        try
-                        {
-                            var jobId = _backgroundJobs.Enqueue<IEmailService>(
-                                x => x.SendLowStockAlertAsync(
-                                    product.Name,
-                                    product.Quantity
-                                ));
-                            _logger?.LogInformation("Enqueued low stock email job {JobId} for product {Product} (stock {Stock})", jobId, product.Name, product.Quantity);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger?.LogError(ex, "Failed to enqueue Hangfire job for low stock alert for product {Product}", product.Name);
-                        }
-                    }
-                    _context.Update(product);
-                }
-            }
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "Failed to save StockOut details/products to database. StockOutId: {Id}", stockOut.Id);
-                ModelState.AddModelError("", "An error occurred while saving the stock out details. Please try again.");
-                await LoadViewBags(model);
-                return View(model);
-            }
+            await _context.SaveChangesAsync();
 
             TempData["Success"] = $"Stock Out completed successfully! Total amount: {totalAmount:N2}";
             return RedirectToAction(nameof(Index));
         }
+        private List<StockOutProductItem>? GetProducts(string productsJson)
+        {
+            if (string.IsNullOrWhiteSpace(productsJson))
+                return null;
+            return JsonSerializer.Deserialize<List<StockOutProductItem>>(
+                    productsJson,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    }
+                );
+        }
+        private async Task<string?> ValidateProducts(List<StockOutProductItem> products)
+        {
+            foreach (var item in products)
+            {
+                var product = await _context.Products.FindAsync(item.ProductId);
 
+                if (product == null)
+                    return $"Product with ID {item.ProductId} does not exist.";
+
+                if (item.Quantity <= 0)
+                    return $"Quantity must be greater than 0 for {item.ProductName}.";
+
+                if (product.Quantity < item.Quantity)
+                    return $"Not enough stock for {item.ProductName}. Available: {product.Quantity}.";
+            }
+
+            return null;
+        }
+        private async Task<IActionResult> ReturnWithError(StockOutViewModel model,string message)
+        {
+            ModelState.AddModelError("", message);
+            await LoadViewBags(model);
+            return View(model);
+        }
+        private async Task SaveStockOutDetails(int stockOutId, List<StockOutProductItem> products)
+        {
+            foreach (var item in products)
+            {
+                _context.StockOutDetails.Add(new StockOutDetail
+                {
+                    StockOutId = stockOutId,
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPrice,
+                    Total = item.Total
+                });
+
+                var product = await _context.Products.FindAsync(item.ProductId);
+
+                if (product == null)
+                    continue;
+
+                product.Quantity -= item.Quantity;
+
+                if (product.Quantity <= 5)
+                {
+                    _backgroundJobs.Enqueue<IEmailService>(x =>
+                        x.SendLowStockAlertAsync(product.Name, product.Quantity));
+                }
+
+                _context.Products.Update(product);
+            }
+        }
         private async Task LoadViewBags(StockOutViewModel model)
         {
             ViewBag.Customers = new SelectList(await _context.Customers.ToListAsync(), "Id", "Name", model.CustomerId);
@@ -239,7 +189,7 @@ namespace POS_Management_System.Controllers
             var stockOut = await _context.StockOuts
                 .Include(s => s.Customer)
                 .Include(s => s.StockOutDetails)
-                   .ThenInclude(d => d.Product)
+                 .ThenInclude(d => d.Product)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (stockOut == null)
