@@ -17,7 +17,8 @@ namespace POS_Management_System.Models
         [ForeignKey("CustomerId")]
         public virtual Customer? Customer { get; set; }
 
-        public virtual ICollection<Payment>? Payments { get; set; }
+        //public virtual ICollection<Payment>? Payments { get; set; }
+        public virtual Payment? Payment { get; set; }
         public virtual ICollection<StockOutDetail>? StockOutDetails { get; set; }
     }
 }

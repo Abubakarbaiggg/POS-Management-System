@@ -1,4 +1,4 @@
-@model IEnumerable<POS_Management_System.Models.StockOut>
+@model IEnumerable<POS_Management_System.Models.StockOut> 
 
 @{
     ViewData["Title"] = "Stock Outs";
@@ -46,20 +46,25 @@
 
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>S.No</th>
                             <th>Date</th>
                             <th>Customer</th>
                             <th>Total Items</th>
+                            <th>Paid Amount</th>
+                            <th>Remaining Amount</th>
+                            <th>Payment Method</th>
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
 
                     <tbody>
+                          @{
+                                int i = 1;
+                            }
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td class="fw-semibold">#@item.Id</td>
-
+                                <td>@i</td>
                                 <td>
                                     @item.Date.ToString("yyyy-MM-dd")
                                 </td>
@@ -73,6 +78,11 @@
                                         @(item.StockOutDetails?.Sum(d => d.Quantity) ?? 0)
                                     </span>
                                 </td>
+                                <td>@item.Payment?.PaidAmount</td>
+
+                                <td>@item.Payment?.RemainingAmount</td>
+
+                                <td>@item.Payment?.PaymentMethod</td>
 
                                 <td class="text-end">
                                     <a asp-action="Details"
@@ -88,10 +98,12 @@
                                     </a>
                                 </td>
                             </tr>
+                            i++;
                         }
                     </tbody>
 
                 </table>
+                <partial name="_Pagination" model="Model" />
             </div>
 
         </section>

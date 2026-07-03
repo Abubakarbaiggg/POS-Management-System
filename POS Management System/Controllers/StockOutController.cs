@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using POS_Management_System.Data;
+using POS_Management_System.Helpers;
 using POS_Management_System.Models;
 using POS_Management_System.Models.ViewModels;
 using POS_Management_System.Services.Email;
@@ -23,14 +24,17 @@ namespace POS_Management_System.Controllers
             _backgroundJobs = backgroundJobs;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page=1)
         {
-            var stockOuts = await _context.StockOuts
+            int pageSize = 10;
+            var stockOuts = await PaginatedList<StockOut>.CreateAsync(
+                _context.StockOuts
                 .Include(s => s.Customer)
+                .Include(s => s.Payment)
                 .Include(s => s.StockOutDetails)
                 .ThenInclude(d => d.Product)
-                .OrderByDescending(s => s.Date)
-                .ToListAsync();
+                .OrderByDescending(s => s.Date),
+                page, pageSize);
             return View(stockOuts);
         }
 
