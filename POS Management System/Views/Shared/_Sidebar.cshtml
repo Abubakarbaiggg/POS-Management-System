@@ -96,6 +96,55 @@
                 <span class="nav-text">Users</span>
             </a>
         }
+        <div class="nav-item">
+
+            <a class="nav-link d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse"
+               href="#reportsMenu"
+               role="button"
+               aria-expanded="false"
+               aria-controls="reportsMenu">
+
+                <div>
+                    <span class="nav-icon">
+                        <i class="bi bi-bar-chart"></i>
+                    </span>
+                    <span class="nav-text">Reports</span>
+                </div>
+
+                <i class="bi bi-chevron-down small"></i>
+            </a>
+
+            <div class="collapse" id="reportsMenu">
+
+                <nav class="nav flex-column ms-4 mt-2">
+
+                    <a class="nav-link" asp-controller="SaleReport" asp-action="Index">
+                        <i class="bi bi-cash-stack me-2"></i> Sales Report
+                    </a>
+
+                    <a class="nav-link" asp-controller="StockReport" asp-action="Index">
+                        <i class="bi bi-box-seam me-2"></i> Stock Report
+                    </a>
+
+                    <a class="nav-link" asp-controller="CustomerReport" asp-action="Index">
+                        <i class="bi bi-people me-2"></i> Customer Report
+                    </a>
+
+                    <a class="nav-link" asp-controller="SupplierReport" asp-action="Index">
+                        <i class="bi bi-truck me-2"></i> Supplier Report
+                    </a>
+
+                    <a class="nav-link" asp-controller="ProfitReport" asp-action="Index">
+                        <i class="bi bi-graph-up-arrow me-2"></i> Profit Report
+                    </a>
+
+                </nav>
+
+            </div>
+
+        </div>
+
 
     </nav>
 

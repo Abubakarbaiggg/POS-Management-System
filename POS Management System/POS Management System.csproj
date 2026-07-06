@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <Folder Include="Seed\" />
+    <Folder Include="Views\Reports\" />
   </ItemGroup>
 
 </Project>
