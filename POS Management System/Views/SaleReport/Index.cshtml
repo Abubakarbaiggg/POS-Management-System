@@ -23,7 +23,10 @@
                 </div>
             </div>
             <div>
-                <a href="#" class="btn btn-success">
+              <a asp-action="Download"
+                   asp-route-fromDate="@ViewBag.FromDate"
+                   asp-route-toDate="@ViewBag.ToDate"
+                   class="btn btn-success">
                     <i class="bi bi-download"></i>
                     Download
                 </a>
