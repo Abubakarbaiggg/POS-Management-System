@@ -8,7 +8,6 @@
 <main class="dashboard-content">
     <div class="container-fluid px-3 px-lg-4 py-4">
 
-        <!-- Page Heading -->
         <div class="page-heading mb-4">
             <div class="page-heading-copy">
                 <span class="page-icon">
@@ -28,7 +27,6 @@
             </div>
         </div>
 
-        <!-- Table Panel -->
         <section class="panel">
 
             <div class="panel-header">
@@ -50,19 +48,25 @@
                             <th>Date</th>
                             <th>Supplier</th>
                             <th>Products</th>
+                            <th>Paid Amount</th>
+                            <th>Remaining Amount</th>
+                            <th>Payment Method</th>
                             <th>Total Amount</th>
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
 
                     <tbody>
+                        @{
+                            int i = 1;
+                        }
                         @foreach (var item in Model)
                         {
                             var total = item.StockInDetails?.Sum(d => d.Total) ?? 0;
                             var productCount = item.StockInDetails?.Count ?? 0;
 
                             <tr>
-                                <td class="fw-semibold">#@item.Id</td>
+                                <td class="fw-semibold">@i</td>
                                 <td>@item.Date.ToString("yyyy-MM-dd")</td>
                                 <td>@item.Supplier?.Name</td>
                                 <td>
@@ -70,6 +74,11 @@
                                         @productCount item(s)
                                     </span>
                                 </td>
+                                <td>@item.SupplierPayment?.PaidAmount</td>
+
+                                <td>@item.SupplierPayment?.RemainingAmount</td>
+
+                                <td>@item.SupplierPayment?.PaymentMethod</td>
                                 <td class="fw-semibold">@total.ToString("N2")</td>
 
                                 <td class="text-end">
@@ -86,10 +95,13 @@
                                     </a>
                                 </td>
                             </tr>
+                            i++;
                         }
                     </tbody>
 
                 </table>
+                <partial name="_Pagination" model="Model" />
+
             </div>
 
         </section>

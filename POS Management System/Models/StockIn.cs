@@ -16,6 +16,7 @@ namespace POS_Management_System.Models
 
         [ForeignKey("SupplierId")]
         public virtual Supplier? Supplier { get; set; }
+        public virtual SupplierPayment? SupplierPayment { get; set; }
 
         public virtual ICollection<StockInDetail>? StockInDetails { get; set; }
     }

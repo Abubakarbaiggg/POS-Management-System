@@ -5,7 +5,6 @@ using POS_Management_System.Data;
 using POS_Management_System.Models;
 using POS_Management_System.Services;
 using POS_Management_System.Services.Email;
-using POS_Management_System.Services.Permission;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");;
 
@@ -19,7 +18,6 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
      
      }).AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddScoped<IPermissionService, PermissionService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews(options =>
 {

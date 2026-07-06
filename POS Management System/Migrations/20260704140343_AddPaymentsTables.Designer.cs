@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using POS_Management_System.Data;
 
@@ -11,9 +12,11 @@ using POS_Management_System.Data;
 namespace POS_Management_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260704140343_AddPaymentsTables")]
+    partial class AddPaymentsTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -301,8 +304,7 @@ namespace POS_Management_System.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StockOutId")
-                        .IsUnique();
+                    b.HasIndex("StockOutId");
 
                     b.ToTable("CustomerPayments");
                 });
@@ -319,10 +321,6 @@ namespace POS_Management_System.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -363,6 +361,30 @@ namespace POS_Management_System.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("POS_Management_System.Models.RolePermission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("POS_Management_System.Models.Sale", b =>
@@ -591,8 +613,7 @@ namespace POS_Management_System.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StockInId")
-                        .IsUnique();
+                    b.HasIndex("StockInId");
 
                     b.ToTable("SupplierPayments");
                 });
@@ -651,8 +672,8 @@ namespace POS_Management_System.Migrations
             modelBuilder.Entity("POS_Management_System.Models.CustomerPayment", b =>
                 {
                     b.HasOne("POS_Management_System.Models.StockOut", "StockOut")
-                        .WithOne("CustomerPayment")
-                        .HasForeignKey("POS_Management_System.Models.CustomerPayment", "StockOutId")
+                        .WithMany()
+                        .HasForeignKey("StockOutId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -668,6 +689,25 @@ namespace POS_Management_System.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("POS_Management_System.Models.RolePermission", b =>
+                {
+                    b.HasOne("POS_Management_System.Models.Permission", "Permission")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("POS_Management_System.Models.Sale", b =>
@@ -763,8 +803,8 @@ namespace POS_Management_System.Migrations
             modelBuilder.Entity("POS_Management_System.Models.SupplierPayment", b =>
                 {
                     b.HasOne("POS_Management_System.Models.StockIn", "StockIn")
-                        .WithOne("SupplierPayment")
-                        .HasForeignKey("POS_Management_System.Models.SupplierPayment", "StockInId")
+                        .WithMany()
+                        .HasForeignKey("StockInId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -796,14 +836,10 @@ namespace POS_Management_System.Migrations
             modelBuilder.Entity("POS_Management_System.Models.StockIn", b =>
                 {
                     b.Navigation("StockInDetails");
-
-                    b.Navigation("SupplierPayment");
                 });
 
             modelBuilder.Entity("POS_Management_System.Models.StockOut", b =>
                 {
-                    b.Navigation("CustomerPayment");
-
                     b.Navigation("StockOutDetails");
                 });
 

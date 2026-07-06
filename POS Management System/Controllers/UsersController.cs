@@ -19,9 +19,9 @@ namespace POS_Management_System.Controllers
             _userManager = userManager;
             _roleManager = roleManager;
         }
-
         public IActionResult Index()
         {
+
             var users = _userManager.Users.ToList();
             return View(users);
         }

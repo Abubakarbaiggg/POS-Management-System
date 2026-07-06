@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace POS_Management_System.Models
 {
-    public class Payment
+    public class CustomerPayment
     {
         public int Id { get; set; }
         [Required]
@@ -24,14 +24,8 @@ namespace POS_Management_System.Models
         public PaymentMethod PaymentMethod { get; set; }
 
         public DateTime PaymentDate { get; set; } = DateTime.Now;
-        [StringLength(100)]
-
-        public string? TransactionId { get; set; }
-        [StringLength(500)]
-
-        public string? Notes { get; set; }
-
         public virtual StockOut StockOut { get; set; }
+
     }
     public enum PaymentMethod
     {
@@ -42,4 +36,5 @@ namespace POS_Management_System.Models
         EasyPaisa,
         Stripe
     }
+
 }

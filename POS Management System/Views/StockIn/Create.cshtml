@@ -110,6 +110,46 @@
                                 <th></th>
                             </tr>
                         </tfoot>
+
+                        <div class="row mt-4">
+
+                            <div class="col-md-4">
+                                <label>Total Amount</label>
+                                <input id="totalAmount"
+                                       class="form-control"
+                                       readonly />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label>Paid Amount</label>
+                                <input id="paidAmount"
+                                       name="PaidAmount"
+                                       class="form-control"
+                                       type="number" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label>Payment Method</label>
+
+                                <select name="PaymentMethod"
+                                        class="form-select">
+
+                                    <option>Cash</option>
+                                    <option>Card</option>
+                                    <option>Bank Transfer</option>
+                                    <option>JazzCash</option>
+                                    <option>EasyPaisa</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+    
+
+
+
                     </table>
 
                 </div>
@@ -125,7 +165,6 @@
 
         </section>
     </div>
-    <script>
                 @section Scripts {
                 <script>
                         let products = [];
@@ -207,6 +246,8 @@
 
                             document.getElementById("grandTotal").innerText =
                                 grandTotal.toFixed(2);
+                    document.getElementById("totalAmount").value =
+                                                    grandTotal.toFixed(2);
 
                             document.getElementById("productsJson").value =
                                 JSON.stringify(products);
@@ -218,5 +259,4 @@
                         }
             </script>
         }
-    </script>
 </main>

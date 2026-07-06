@@ -16,7 +16,7 @@
     </div>
   
     <nav class="sidebar-nav">
-        @if (await PermissionService.HasPermissionAsync(User, "Dashboard View"))
+        @if (User.HasClaim("Permission", "Dashboard View"))
         {
             <a class="nav-link @(currentController == "Dashboard" ? "active" : "")"
             asp-controller="Dashboard" asp-action="Index">
@@ -24,7 +24,7 @@
                 <span class="nav-text">Dashboard</span>
             </a>
         }
-        @if (await PermissionService.HasPermissionAsync(User, "Permission View"))
+        @if (User.HasClaim("Permission", "Permission View"))
         {
             <a class="nav-link @(currentController == "Permissions" ? "active" : "")"
             asp-controller="Permissions" asp-action="Index">
@@ -32,7 +32,7 @@
                 <span class="nav-text">Permissions</span>
             </a>
         }
-        @if (await PermissionService.HasPermissionAsync(User, "Role View"))
+        @if (User.HasClaim("Permission", "Role View"))
         {
             <a class="nav-link @(currentController == "Roles" ? "active" : "")"
             asp-controller="Roles" asp-action="Index">
@@ -40,7 +40,7 @@
                 <span class="nav-text">Roles</span>
             </a>
         }
-        @if (await PermissionService.HasPermissionAsync(User, "Category View"))
+        @if (User.HasClaim("Permission", "Category View"))
         {
             <a class="nav-link @(currentController == "Category" ? "active" : "")"
             asp-controller="Category" asp-action="Index">
@@ -48,7 +48,7 @@
                 <span class="nav-text">Category</span>
             </a>
         }
-        @if (await PermissionService.HasPermissionAsync(User, "Product View"))
+        @if (User.HasClaim("Permission", "Product View"))
         {
             <a class="nav-link @(currentController == "Product" ? "active" : "")"
             asp-controller="Product" asp-action="Index">
@@ -56,7 +56,7 @@
                 <span class="nav-text">Product</span>
             </a>
         }
-        @if (await PermissionService.HasPermissionAsync(User, "Supplier View"))
+        @if (User.HasClaim("Permission", "Supplier View"))
         {
             <a class="nav-link @(currentController == "Supplier" ? "active" : "")"
             asp-controller="Supplier" asp-action="Index">
@@ -64,15 +64,14 @@
                 <span class="nav-text">Supplier</span>
             </a>
         }
-        @if (await PermissionService.HasPermissionAsync(User, "StockIn View"))
+        @if (User.HasClaim("Permission", "StockIn View"))
         {
             <a class="nav-link @(currentController == "StockIn" ? "active" : "")"
             asp-controller="StockIn" asp-action="Index">
                 <span class="nav-icon"><i class="bi bi-box-arrow-in-down"></i></span>
                 <span class="nav-text">Stock In</span>
             </a>
-        }
-        @if (await PermissionService.HasPermissionAsync(User, "StockOut View"))
+            @if (User.HasClaim("Permission", "StockOut View"))
         {
             <a class="nav-link @(currentController == "StockOut" ? "active" : "")"
             asp-controller="StockOut" asp-action="Index">
@@ -80,7 +79,8 @@
                 <span class="nav-text">Stock Out</span>
             </a>
         }
-        @if (await PermissionService.HasPermissionAsync(User, "Customer View"))
+        }
+        @if (User.HasClaim("Permission", "Customer View"))
         {
             <a class="nav-link @(currentController == "Customer" ? "active" : "")"
             asp-controller="Customer" asp-action="Index">
@@ -88,7 +88,7 @@
                 <span class="nav-text">Customer</span>
             </a>
         }
-        @if (await PermissionService.HasPermissionAsync(User, "User View"))
+        @if (User.HasClaim("Permission", "User View"))
         {
             <a class="nav-link @(currentController == "Users" ? "active" : "")"
                asp-controller="Users" asp-action="Index">

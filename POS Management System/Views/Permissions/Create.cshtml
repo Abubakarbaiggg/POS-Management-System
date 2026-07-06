@@ -50,21 +50,31 @@
                     </div>
 
                     <div class="row g-3">
-
-                        <!-- Permission Name -->
-                        <div class="col-12">
+                        <div class="col-md-6">
                             <label asp-for="Name" class="form-label"></label>
 
                             <input asp-for="Name"
                                    class="form-control"
-                                   placeholder="Enter permission name" />
+                                   placeholder="Enter Permission" />
 
-                            <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
+                        <div class="col-md-6">
+                            <label asp-for="Type" class="form-label"></label>
+
+                            <select asp-for="Type" class="form-select">
+                                <option value="">-- Select Type --</option>
+                                <option>Create</option>
+                                <option>Edit</option>
+                                <option>Delete</option>
+                                <option>View</option>
+                            </select>
+
+                            <span asp-validation-for="Type" class="text-danger"></span>
+                        </div>
+                        <span asp-validation-for="Name" class="text-danger"></span>
 
                     </div>
 
-                    <!-- BUTTONS -->
                     <div class="d-flex justify-content-end gap-2 mt-4">
 
                         <a asp-action="Index" class="btn btn-outline-secondary">
@@ -136,4 +146,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+  
 }

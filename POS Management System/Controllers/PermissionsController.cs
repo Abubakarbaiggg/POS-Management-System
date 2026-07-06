@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using POS_Management_System.Data;
-using POS_Management_System.Models;
-using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
 using POS_Management_System.Helpers;
+using POS_Management_System.Models;
+using POS_Management_System.Models.ViewModels;
+using System.Security.Claims;
 
 namespace POS_Management_System.Controllers
 {
@@ -23,19 +24,30 @@ namespace POS_Management_System.Controllers
             _roleManager = roleManager;
         }
 
-        public async Task<IActionResult> Index(int page=1)
+        public async Task<IActionResult> Index()
         {
-            int pageSize = 10;
-            var perms = await PaginatedList<Permission>.CreateAsync(
-                _context.Permissions.OrderBy(p => p.Name),
-                page,pageSize);
-            return View(perms);
+            var permissions = await _context.Permissions
+                .OrderBy(x => x.Name)
+                .ThenBy(x => x.Type)
+                .ToListAsync();
+
+            var model = permissions
+                .GroupBy(x => x.Name)
+                .Select(g => new PermissionGroupViewModel
+                {
+                    Name = g.Key,
+                    Permissions = g.ToList()
+                })
+                .ToList();
+
+            return View(model);
         }
 
         public IActionResult Create()
         {
             return View();
         }
+       
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -43,8 +55,7 @@ namespace POS_Management_System.Controllers
         {
             if (!ModelState.IsValid) return View(permission);
 
-            // ensure unique name
-            if (await _context.Permissions.AnyAsync(p => p.Name == permission.Name))
+            if (await _context.Permissions.AnyAsync(p => p.Name == permission.Name && p.Type == permission.Type))
             {
                 ModelState.AddModelError("Name", "A permission with this name already exists.");
                 return View(permission);
@@ -56,57 +67,23 @@ namespace POS_Management_System.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Edit(int id)
-        {
-            var permission = await _context.Permissions.FindAsync(id);
-            if (permission == null) return NotFound();
-            return View(permission);
-        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Permission permission)
+        public async Task<IActionResult> Delete(string name, string type)
         {
-            if (id != permission.Id) return BadRequest();
-            if (!ModelState.IsValid) return View(permission);
+            var permission = await _context.Permissions
+                .FirstOrDefaultAsync(x => x.Name == name && x.Type == type);
 
-            if (await _context.Permissions.AnyAsync(p => p.Name == permission.Name && p.Id != id))
-            {
-                ModelState.AddModelError("Name", "A permission with this name already exists.");
-                return View(permission);
-            }
-
-            _context.Update(permission);
-            await _context.SaveChangesAsync();
-            TempData["Success"] = "Permission updated.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        public async Task<IActionResult> Delete(int id)
-        {
-            var permission = await _context.Permissions.FindAsync(id);
-            if (permission == null) return NotFound();
-            return View(permission);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var permission = await _context.Permissions.FindAsync(id);
-            if (permission == null) return NotFound();
+            if (permission == null)
+                return NotFound();
 
             _context.Permissions.Remove(permission);
             await _context.SaveChangesAsync();
-            TempData["Success"] = "Permission deleted.";
+
+            TempData["Success"] = $"{type} permission deleted.";
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Details(int id)
-        {
-            var permission = await _context.Permissions.FindAsync(id);
-            if (permission == null) return NotFound();
-            return View(permission);
-        }
     }
 }

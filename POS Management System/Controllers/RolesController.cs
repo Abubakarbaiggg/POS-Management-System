@@ -7,6 +7,7 @@ using System.Data;
 using System.Security.Claims;
 using POS_Management_System.Models;
 using POS_Management_System.Models.ViewModels;
+using System.Security.Claims;
 
 namespace POS_Management_System.Controllers
 {
@@ -65,7 +66,6 @@ namespace POS_Management_System.Controllers
 
         }
 
-        // GET: Roles/ManagePermissions/{id}
         public async Task<IActionResult> ManagePermissions(string id)
         {
             if (string.IsNullOrEmpty(id)) return NotFound();
@@ -73,14 +73,32 @@ namespace POS_Management_System.Controllers
             var role = await _roleManager.FindByIdAsync(id);
             if (role == null) return NotFound();
 
-            var allPermissions = await _context.Permissions.OrderBy(p => p.Name).ToListAsync();
-            var assigned = await _context.RolePermissions.Where(rp => rp.RoleId == id).Select(rp => rp.PermissionId).ToListAsync();
+            var allPermissions = await _context.Permissions
+       .OrderBy(p => p.Name)
+       .ThenBy(p => p.Type)
+       .ToListAsync();
+
+            var assignedPermissions = (await _roleManager.GetClaimsAsync(role))
+                .Where(c => c.Type == "Permission")
+                .Select(c => c.Value)
+                .ToList();
 
             var model = new RolePermissionsViewModel
             {
                 RoleId = role.Id,
                 RoleName = role.Name!,
-                Permissions = allPermissions.Select(p => new PermissionItem { Id = p.Id, Name = p.Name, Selected = assigned.Contains(p.Id) }).ToList()
+                PermissionGroups = allPermissions
+                    .GroupBy(p => p.Name)
+                    .Select(g => new PermissionGroupItem
+                    {
+                        Name = g.Key,
+                        Types = g.Select(x => new PermissionTypeItem
+                        {
+                            Id = x.Id,
+                            Type = x.Type,
+                            Selected = assignedPermissions.Contains($"{x.Name}:{x.Type}")
+                        }).ToList()
+                    }).ToList()
             };
 
             return View(model);
@@ -91,31 +109,33 @@ namespace POS_Management_System.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateRolePermissions(string roleId, int[]? selectedPermissionIds)
         {
-            if (string.IsNullOrEmpty(roleId))
+            var role = await _roleManager.FindByIdAsync(roleId);
+
+            var existingClaims = await _roleManager.GetClaimsAsync(role);
+
+            foreach (var claim in existingClaims.Where(c => c.Type == "Permission"))
             {
-                TempData["Error"] = "Invalid role selected.";
-                return RedirectToAction(nameof(Index));
+                await _roleManager.RemoveClaimAsync(role, claim);
             }
 
-            // remove existing mappings
-            var existing = _context.RolePermissions.Where(rp => rp.RoleId == roleId);
-            _context.RolePermissions.RemoveRange(existing);
-
-            // add selected
-            if (selectedPermissionIds != null && selectedPermissionIds.Length > 0)
+            if (selectedPermissionIds != null && selectedPermissionIds.Any())
             {
-                foreach (var pid in selectedPermissionIds.Distinct())
+                var permissions = await _context.Permissions
+                    .Where(p => selectedPermissionIds.Contains(p.Id))
+                    .ToListAsync();
+
+                foreach (var permission in permissions)
                 {
-                    _context.RolePermissions.Add(new RolePermission { RoleId = roleId, PermissionId = pid });
+                    await _roleManager.AddClaimAsync(
+                        role,
+                        new Claim("Permission", $"{permission.Name} {permission.Type}")
+                    );
                 }
-                ;
-
             }
-
-            await _context.SaveChangesAsync();
-            TempData["Success"] = "Role permissions updated.";
+            TempData["Success"] = "Role permissions updated successfully.";
             return RedirectToAction(nameof(Index));
         }
+
 
         public async Task<IActionResult> Edit(string id)
         {
@@ -139,7 +159,6 @@ namespace POS_Management_System.Controllers
                 return View(role);
             }
 
-            // check duplicate name
             var existing = await _roleManager.FindByNameAsync(name);
             if (existing != null && existing.Id != id)
             {

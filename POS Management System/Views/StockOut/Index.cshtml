@@ -78,11 +78,11 @@
                                         @(item.StockOutDetails?.Sum(d => d.Quantity) ?? 0)
                                     </span>
                                 </td>
-                                <td>@item.Payment?.PaidAmount</td>
+                                <td>@item.CustomerPayment?.PaidAmount</td>
 
-                                <td>@item.Payment?.RemainingAmount</td>
+                                <td>@item.CustomerPayment?.RemainingAmount</td>
 
-                                <td>@item.Payment?.PaymentMethod</td>
+                                <td>@item.CustomerPayment?.PaymentMethod</td>
 
                                 <td class="text-end">
                                     <a asp-action="Details"

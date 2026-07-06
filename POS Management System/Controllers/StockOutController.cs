@@ -30,7 +30,7 @@ namespace POS_Management_System.Controllers
             var stockOuts = await PaginatedList<StockOut>.CreateAsync(
                 _context.StockOuts
                 .Include(s => s.Customer)
-                .Include(s => s.Payment)
+                .Include(c => c.CustomerPayment)
                 .Include(s => s.StockOutDetails)
                 .ThenInclude(d => d.Product)
                 .OrderByDescending(s => s.Date),
@@ -82,7 +82,7 @@ namespace POS_Management_System.Controllers
          
             await _context.SaveChangesAsync();
 
-            var payment = new Payment
+            var payment = new CustomerPayment
             {
                 StockOutId = stockOut.Id,
                 TotalAmount = totalAmount,
@@ -92,7 +92,7 @@ namespace POS_Management_System.Controllers
             };
 
 
-            _context.Payments.Add(payment);
+            _context.CustomerPayments.Add(payment);
 
             await SaveStockOutDetails(stockOut.Id, products);
 

@@ -7,51 +7,78 @@
 <main class="dashboard-content">
     <div class="container-fluid px-3 px-lg-4 py-4">
 
-        <div class="page-heading">
+        <div class="page-heading d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="h3">Permissions - @Model.RoleName</h1>
+                <h2 class="mb-1">Manage Permissions</h2>
+                <p class="text-muted mb-0">
+                    Role: <strong>@Model.RoleName</strong>
+                </p>
             </div>
+
+            <button type="button" id="selectAllBtn" class="btn btn-outline-primary">
+                Select All
+            </button>
         </div>
 
-        <form asp-action="UpdateRolePermissions" method="post" class="panel">
+        <form asp-action="UpdateRolePermissions" method="post" class="panel mt-3">
 
             <input type="hidden" name="roleId" value="@Model.RoleId" />
 
-            <div class="table-responsive p-3">
+            <div class="table-responsive">
 
-                <table class="table">
+                <table class="table align-middle">
 
                     <thead>
                         <tr>
-                            <th>Permission</th>
-                            <th>Assigned</th>
+                            <th style="width:250px;">Permission</th>
+                            <th>Types</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        @foreach (var p in Model.Permissions)
+
+                        @foreach (var group in Model.PermissionGroups)
                         {
                             <tr>
-                                <td>@p.Name</td>
-                                <td>
-                                    <input type="checkbox"
-                                           name="selectedPermissionIds"
-                                           value="@p.Id"
-                                    @(p.Selected ? "checked" : "") />
+
+                                <td class="fw-semibold">
+                                    @group.Name
                                 </td>
+
+                                <td>
+
+                                    @foreach (var item in group.Types)
+                                    {
+                                        <input type="checkbox"
+                                               class="d-none permission-checkbox"
+                                               id="perm_@item.Id"
+                                               name="selectedPermissionIds"
+                                               value="@item.Id"
+                                        @(item.Selected ? "checked" : "") />
+
+                                        <label for="perm_@item.Id"
+                                               class="badge rounded-pill me-2 mb-2 permission-badge @(item.Selected ? "bg-primary" : "bg-light text-dark border")"
+                                               style="cursor:pointer;padding:10px 15px;">
+
+                                            @item.Type
+
+                                        </label>
+                                    }
+
+                                </td>
+
                             </tr>
                         }
+
                     </tbody>
 
                 </table>
 
             </div>
 
-            <div class="d-flex justify-content-end gap-2 p-3 border-top">
+            <div class="border-top p-3 d-flex justify-content-end">
 
-                <a asp-action="Index" class="btn btn-secondary">Back</a>
-
-                <button type="submit" class="btn btn-primary">
+                <button class="btn btn-primary">
                     Save Permissions
                 </button>
 
@@ -61,3 +88,48 @@
 
     </div>
 </main>
+
+@section Scripts {
+
+    <script>
+
+        document.querySelectorAll(".permission-checkbox").forEach(cb => {
+
+            cb.addEventListener("change", function () {
+
+                let label = document.querySelector("label[for='" + this.id + "']");
+
+                if(this.checked)
+                {
+                    label.classList.remove("bg-light","text-dark","border");
+                    label.classList.add("bg-primary");
+                }
+                else
+                {
+                    label.classList.remove("bg-primary");
+                    label.classList.add("bg-light","text-dark","border");
+                }
+
+            });
+
+        });
+
+
+        document.getElementById("selectAllBtn").addEventListener("click", function () {
+
+            let checkboxes = document.querySelectorAll(".permission-checkbox");
+
+            let allSelected = [...checkboxes].every(x => x.checked);
+
+            checkboxes.forEach(cb => {
+
+                cb.checked = !allSelected;
+                cb.dispatchEvent(new Event("change"));
+
+            });
+
+        });
+
+    </script>
+
+}

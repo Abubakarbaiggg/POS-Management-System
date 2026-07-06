@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using POS_Management_System.Data;
+using POS_Management_System.Helpers;
 using POS_Management_System.Models;
 using POS_Management_System.Models.ViewModels;
+using POS_Management_System.Services.Email;
 using System.Text.Json;
 
 namespace POS_Management_System.Controllers
@@ -20,14 +24,17 @@ namespace POS_Management_System.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page=1)
         {
-            var stockIns = await _context.StockIns
+            int pageSize = 5;
+            var stockIns = await PaginatedList<StockIn>.CreateAsync(
+                _context.StockIns
                 .Include(s => s.Supplier)
+                .Include(s => s.SupplierPayment)
                 .Include(s => s.StockInDetails)
                 .ThenInclude(d => d.Product)
-                .OrderByDescending(s => s.Date)
-                .ToListAsync();
+                .OrderByDescending(s => s.Date),
+                page,pageSize);
             return View(stockIns);
         }
 
@@ -47,15 +54,7 @@ namespace POS_Management_System.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(StockInViewModel model, string productsJson)
         {
-            if (string.IsNullOrEmpty(productsJson))
-            {
-                ModelState.AddModelError("", "Please add at least one product");
-                await LoadViewBags(model);
-                return View(model);
-            }
-
-            var products = JsonSerializer.Deserialize<List<StockInProductItem>>(productsJson,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var products = GetProducts(productsJson);
 
             if (products == null || products.Count == 0)
             {
@@ -64,74 +63,100 @@ namespace POS_Management_System.Controllers
                 return View(model);
             }
 
+            var validationError = await ValidateProducts(products);
+            if (validationError != null)
+            {
+                return await ReturnWithError(model, validationError);
+            }
+
+            decimal totalAmount = products.Sum(p => p.Total);
+
+            var stockIn = new StockIn
+            {
+                SupplierId = model.SupplierId,
+                Date = model.Date
+            };
+
+            _context.StockIns.Add(stockIn);
+            await _context.SaveChangesAsync();
+
+            var payment = new SupplierPayment
+            {
+                StockInId = stockIn.Id,
+                TotalAmount = totalAmount,
+                PaidAmount = model.PaidAmount,
+                RemainingAmount = totalAmount - model.PaidAmount,
+                PaymentMethod = model.PaymentMethod
+            };
+            _context.SupplierPayments.Add(payment);
+
+            await SaveStockInDetails(stockIn.Id, products);
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Stock In completed successfully! Total amount: {totalAmount:N2}";
+            return RedirectToAction(nameof(Index));
+        }
+
+
+
+        private async Task SaveStockInDetails(int stockInId, List<StockInProductItem> products)
+        {
             foreach (var item in products)
             {
-                var productExists = await _context.Products.AnyAsync(p => p.Id == item.ProductId);
-                if (!productExists)
+                _context.StockInDetails.Add(new StockInDetail
                 {
-                    ModelState.AddModelError("", $"Product with ID {item.ProductId} does not exist in database");
-                    await LoadViewBags(model);
-                    return View(model);
-                }
+                    StockInId = stockInId,
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity,
+                    PurchasePrice = item.PurchasePrice,
+                    Total = item.Total
+                });
+
+                var product = await _context.Products.FindAsync(item.ProductId);
+
+                if (product == null)
+                    continue;
+
+                product.Quantity += item.Quantity;
+                _context.Products.Update(product);
+            }
+        }
+        private async Task<string?> ValidateProducts(List<StockInProductItem> products)
+        {
+            foreach (var item in products)
+            {
+                var product = await _context.Products.FindAsync(item.ProductId);
+
+                if (product == null)
+                    return $"Product with ID {item.ProductId} does not exist.";
 
                 if (item.Quantity <= 0)
-                {
-                    ModelState.AddModelError("", $"Quantity must be greater than 0 for {item.ProductName}");
-                    await LoadViewBags(model);
-                    return View(model);
-                }
-
-                if (item.PurchasePrice <= 0)
-                {
-                    ModelState.AddModelError("", $"Purchase price must be greater than 0 for {item.ProductName}");
-                    await LoadViewBags(model);
-                    return View(model);
-                }
+                    return $"Quantity must be greater than 0 for {item.ProductName}.";
             }
 
-            if (!ModelState.IsValid)
-            {
-                await LoadViewBags(model);
-                return View(model);
-            }
+            return null;
+        }
 
-                decimal totalAmount = products.Sum(p => p.Total);
-
-                var stockIn = new StockIn
-                {
-                    SupplierId = model.SupplierId,
-                    Date = model.Date
-                };
-
-                _context.StockIns.Add(stockIn);
-                await _context.SaveChangesAsync();
-
-                foreach (var item in products)
-                {
-                    var stockInDetail = new StockInDetail
+        private List<StockInProductItem>? GetProducts(string productsJson)
+        {
+            if (string.IsNullOrWhiteSpace(productsJson))
+                return null;
+            return JsonSerializer.Deserialize<List<StockInProductItem>>(
+                    productsJson,
+                    new JsonSerializerOptions
                     {
-                        StockInId = stockIn.Id,
-                        ProductId = item.ProductId,
-                        Quantity = item.Quantity,
-                        PurchasePrice = item.PurchasePrice,
-                        Total = item.Total
-                    };
-                    _context.StockInDetails.Add(stockInDetail);
-
-                    var product = await _context.Products.FindAsync(item.ProductId);
-                    if (product != null)
-                    {
-                        product.Quantity += item.Quantity;
-                        _context.Update(product);
+                        PropertyNameCaseInsensitive = true
                     }
-                }
+                );
+        }
 
-                await _context.SaveChangesAsync();
-
-                TempData["Success"] = $"Stock In completed successfully! Total amount: {totalAmount:N2}";
-                return RedirectToAction(nameof(Index));
-            }
-           
+        private async Task<IActionResult> ReturnWithError(StockInViewModel model, string message)
+        {
+            ModelState.AddModelError("", message);
+            await LoadViewBags(model);
+            return View(model);
+        }
 
         private async Task LoadViewBags(StockInViewModel model)
         {

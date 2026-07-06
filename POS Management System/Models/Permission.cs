@@ -10,6 +10,7 @@ namespace POS_Management_System.Models
         [StringLength(100)]
         [Display(Name = "Permission Name")]
         public string Name { get; set; }
+        public string Type { get; set; }
 
         // Description removed per request
     }

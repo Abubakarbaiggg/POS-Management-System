@@ -18,6 +18,9 @@ namespace POS_Management_System.Models.ViewModels
         public List<StockInProductItem> Products { get; set; } = new List<StockInProductItem>();
 
         public decimal TotalAmount { get; set; }
+        public decimal PaidAmount { get; set; }
+
+        public PaymentMethod PaymentMethod { get; set; }
     }
 
     public class StockInProductItem

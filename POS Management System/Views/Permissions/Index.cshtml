@@ -1,4 +1,5 @@
-@model POS_Management_System.Helpers.PaginatedList<POS_Management_System.Models.Permission>
+@* @model POS_Management_System.Helpers.PaginatedList<POS_Management_System.Models.Permission> *@
+@model List<POS_Management_System.Models.ViewModels.PermissionGroupViewModel>
 
 @{
     ViewData["Title"] = "Permissions";
@@ -77,7 +78,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Permission Name</th>
-                            <th class="text-end">Actions</th>
+                            <th>Type</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -89,31 +90,33 @@
                         {
                             <tr>
                                 <td>@i</td>
-                                <td class="fw-semibold">@permission.Name</td>
-                                <td class="text-end">
-                                    <a asp-action="Details" asp-route-id="@permission.Id"
-                                       class="btn btn-info btn-sm">
-                                        Details
-                                    </a>
+                                <td class="fw-semibold">
+                                    @permission.Name
+                                </td>
+                                <td>
+                                    @foreach (var item in permission.Permissions)
+                                    {
+                                        <form asp-action="Delete" method="post" style="display:inline;">
+                                            <input type="hidden" name="name" value="@permission.Name" />
+                                            <input type="hidden" name="type" value="@item.Type" />
 
-                                    <a asp-action="Edit"
-                                       asp-route-id="@permission.Id"
-                                       class="btn btn-warning btn-sm">
-                                        Edit
-                                    </a>
+                                            <span class="badge bg-primary me-1 d-inline-flex align-items-center gap-1">
+                                                @item.Type
 
-                                    <a asp-action="Delete"
-                                       asp-route-id="@permission.Id"
-                                       class="btn btn-danger btn-sm">
-                                        Delete
-                                    </a>
+                                                <button type="submit"
+                                                        style="border:none;background:none;color:white;font-weight:bold;">
+                                                    ×
+                                                </button>
+                                            </span>
+                                        </form>
+                                    }
                                 </td>
                             </tr>
                             i++;
                         }
                     </tbody>
                 </table>
-                <partial name="_Pagination" model="Model" />
+                @* <partial name="_Pagination" model="Model" /> *@
 
             </div>
         </section>
