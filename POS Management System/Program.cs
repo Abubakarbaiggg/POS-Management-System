@@ -2,6 +2,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using POS_Management_System.Data;
+using POS_Management_System.Hubs;
 using POS_Management_System.Models;
 using POS_Management_System.Services;
 using POS_Management_System.Services.Email;
@@ -27,6 +28,7 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add(new Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter(policy));
 });
 builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
@@ -54,6 +56,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<PosHub>("/posHub");
 
 app.MapStaticAssets();
 
