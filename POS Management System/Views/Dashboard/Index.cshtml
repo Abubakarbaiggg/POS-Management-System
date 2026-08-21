@@ -13,7 +13,7 @@
             </div>
         </div>
 
-        <!-- ROW 1 -->
+        <!-- KPI ROW -->
         <section class="row g-3">
 
             <div class="col-xl-3 col-md-6">
@@ -46,42 +46,135 @@
 
         </section>
 
-        <!-- ROW 2 -->
-        <section class="row g-3 mt-2">
+        <!-- Charts Row -->
+        <section class="row g-3 mt-3">
 
-            <div class="col-xl-3 col-md-6">
-                <div class="metric-card">
-                    <div>Stock In (Month)</div>
-                    <h3>Rs @Model.MonthlyStockIn.ToString("N0")</h3>
+            <div class="col-xl-8 col-lg-12">
+                <div class="card">
+                    <div class="card-body" style="min-height:470px;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Sales (Last 6 months)</h5>
+                            <small class="text-muted">Trends and growth</small>
+                        </div>
+                        <canvas id="salesChart" height="470" style="max-height:470px; width:100%;"></canvas>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-xl-3 col-md-6">
-                <div class="metric-card">
-                    <div>Customers</div>
-                    <h3>@Model.CustomersCount</h3>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6">
-                <div class="metric-card">
-                    <div>Suppliers</div>
-                    <h3>@Model.SuppliersCount</h3>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6">
-                <div class="metric-card">
-                    <div>Stock Movement</div>
-                    <small>In vs Out</small>
-                    <div>
-                        <b>IN:</b> @Model.TotalStockIn.ToString("N0") <br />
-                        <b>OUT:</b> @Model.TotalStockOut.ToString("N0")
+            <div class="col-xl-4 col-lg-12">
+                <div class="card">
+                    <div class="card-body" style="min-height:470px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                        <h5 class="mb-3" style="width:100%;">Quick Overview</h5>
+                        <canvas id="overviewDonut" height="470" style="max-height:470px; width:100%; max-width:420px;"></canvas>
+                        <div class="mt-3 text-muted small" style="width:100%; text-align:left;">
+                            <div><strong>Products:</strong> @Model.ProductsCount</div>
+                            <div><strong>Low Stock:</strong> @Model.LowStockCount</div>
+                            <div><strong>Customers:</strong> @Model.CustomersCount</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
         </section>
 
+        <!-- Stock Movement Row -->
+        <section class="row g-3 mt-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Stock Movement (In vs Out)</h5>
+                            <small class="text-muted">Monthly comparison</small>
+                        </div>
+                        <canvas id="stockChart" height="80"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </div>
 </main>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        (function () {
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            const stockCtx = document.getElementById('stockChart').getContext('2d');
+            const donutCtx = document.getElementById('overviewDonut').getContext('2d');
+
+            async function fetchJson(url) {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            }
+
+            function formatCurrency(n) { return n ? n.toLocaleString() : '0'; }
+
+            // Sales chart
+            fetchJson('/Dashboard/SalesChartData?months=6').then(data => {
+                const labels = data.map(x => x.month);
+                const values = data.map(x => parseFloat(x.sales));
+
+                new Chart(salesCtx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Sales',
+                            data: values,
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37,99,235,0.12)',
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#2563eb',
+                            pointRadius: 4,
+                            tension: 0.3,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        plugins: { legend: { display: false } },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { ticks: { callback: v => 'Rs ' + formatCurrency(v) } }
+                        }
+                    }
+                });
+            }).catch(console.error);
+
+            // Stock movement
+            fetchJson('/Dashboard/StockMovementData?months=6').then(data => {
+                const labels = data.map(x => x.month);
+                const inVals = data.map(x => parseFloat(x.stockIn));
+                const outVals = data.map(x => parseFloat(x.stockOut));
+
+                new Chart(stockCtx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [
+                            { label: 'Stock In', data: inVals, backgroundColor: 'rgba(16,185,129,0.9)' },
+                            { label: 'Stock Out', data: outVals, backgroundColor: 'rgba(220,38,38,0.9)' }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: { x: { stacked: false }, y: { ticks: { callback: v => formatCurrency(v) } } }
+                    }
+                });
+            }).catch(console.error);
+
+            // Donut overview
+            const donutData = [@Model.ProductsCount, @Model.LowStockCount, @Model.CustomersCount, @Model.SuppliersCount];
+            new Chart(donutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Products', 'Low Stock', 'Customers', 'Suppliers'],
+                    datasets: [{ data: donutData, backgroundColor: ['#2563eb', '#f59e0b', '#10b981', '#8b5cf6'] }]
+                },
+                options: { plugins: { legend: { position: 'bottom' } }, responsive: true }
+            });
+        })();
+    </script>
+}
