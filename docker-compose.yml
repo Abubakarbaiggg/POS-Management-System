@@ -2,7 +2,7 @@ version: '3.8'
 services:
   pos-management:
     build:
-      context: .
+      context: "./POS Management System"
       dockerfile: Dockerfile
     image: pos-management:latest
     container_name: pos-management
@@ -10,38 +10,36 @@ services:
       - "80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      # Override connection string to use SQLite inside container and persist file under mounted volume
+      - ConnectionStrings__DefaultConnection=Data Source=/app/Data/pos.db
     networks:
       - webnet
-    restart: unless-stopped
-
-  db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: posdb
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=Your_strong_P@ssw0rd
-    ports:
-      - "1433:1433"
     volumes:
-      - dbdata:/var/opt/mssql
-      - ./POSManagementSystem.sql:/scripts/POSManagementSystem.sql:ro
-    networks:
-      - webnet
-    restart: unless-stopped
-
-  db-init:
-    image: mcr.microsoft.com/mssql-tools
-    container_name: posdb-init
+      - ./"POS Management System"/Data:/app/Data
     depends_on:
-      - db
+      - migrate
+    restart: unless-stopped
+
+  migrate:
+    image: mcr.microsoft.com/dotnet/sdk:10.0
+    container_name: pos-migrate
+    working_dir: /src
     volumes:
-      - ./POSManagementSystem.sql:/scripts/POSManagementSystem.sql:ro
-    environment:
-      - SA_PASSWORD=Your_strong_P@ssw0rd
-    entrypoint: ["/bin/bash","-c","until /opt/mssql-tools/bin/sqlcmd -S db -U SA -P \"$SA_PASSWORD\" -Q 'SELECT 1' >/dev/null 2>&1; do echo waiting for db; sleep 1; done; echo running init script; /opt/mssql-tools/bin/sqlcmd -S db -U SA -P \"$SA_PASSWORD\" -i /scripts/POSManagementSystem.sql"]
-    restart: "no"
+      - ./:/src
+    entrypoint: ["bash","-c","cd 'POS Management System' && dotnet restore && dotnet build -c Release && dotnet ef database update --project 'POS Management System' --startup-project 'POS Management System' || true"]
     networks:
       - webnet
+    restart: "no"
+
+  sqlite:
+    image: nouchka/sqlite3:latest
+    container_name: pos-sqlite
+    # This container just provides a writable directory for the SQLite file; the app can mount the same path.
+    volumes:
+      - ./POS Management System/Data:/data
+    networks:
+      - webnet
+    restart: unless-stopped
 
   nginx:
     image: nginx:stable-alpine
@@ -59,4 +57,5 @@ services:
     restart: unless-stopped
 
 volumes:
+  # Keep existing named volumes here if you still use sqlserver in other environments
   dbdata:

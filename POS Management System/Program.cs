@@ -1,4 +1,6 @@
-    using Hangfire;
+using Hangfire;
+using System;
+using System.IO;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using POS_Management_System.Data;
@@ -9,7 +11,20 @@ using POS_Management_System.Services.Email;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");;
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+// Detect whether the connection string targets SQLite (file-based) or a SQL Server instance.
+var useSqlite = connectionString.StartsWith("Data Source=", StringComparison.OrdinalIgnoreCase)
+                || connectionString.EndsWith(".db", StringComparison.OrdinalIgnoreCase)
+                || connectionString.Contains(".sqlite", StringComparison.OrdinalIgnoreCase);
+
+if (useSqlite)
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connectionString));
+}
+else
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+}
+
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;
@@ -36,8 +51,12 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.ExpireTimeSpan = TimeSpan.FromHours(1);
     options.SlidingExpiration = true;
 });
-builder.Services.AddHangfire(x => x.UseSqlServerStorage(connectionString));
-builder.Services.AddHangfireServer();
+// Configure Hangfire only for SQL Server storage. When using SQLite this project will skip Hangfire SQL Server storage to avoid requiring the SQL Server-specific storage provider.
+if (!useSqlite)
+{
+    builder.Services.AddHangfire(x => x.UseSqlServerStorage(connectionString));
+    builder.Services.AddHangfireServer();
+}
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailService, EmailService>();
 var app = builder.Build();
@@ -45,7 +64,39 @@ var app = builder.Build();
 using(var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    await DbSeeder.SeedAsync(services);
+    try
+    {
+        // Ensure database directory exists when using SQLite so the file can be created inside container/host volume
+        if (useSqlite)
+        {
+            try
+            {
+                // Attempt to get the data source path from the connection string
+                var dataSource = connectionString.Split('=', 2)[1].Trim();
+                var dbDir = Path.GetDirectoryName(dataSource);
+                if (!string.IsNullOrEmpty(dbDir) && !Directory.Exists(dbDir))
+                {
+                    Directory.CreateDirectory(dbDir);
+                }
+            }
+            catch
+            {
+                // ignore parsing failures; migration will still attempt to create the file if possible
+            }
+        }
+
+        // Apply any pending EF Core migrations (works for SQLite and SQL Server)
+        var db = services.GetRequiredService<ApplicationDbContext>();
+        db.Database.Migrate();
+
+        await DbSeeder.SeedAsync(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+        throw;
+    }
 }
 
 // Configure the HTTP request pipeline.
@@ -57,7 +108,11 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseHangfireDashboard(); 
+// Only enable Hangfire dashboard when SQL Server storage is in use.
+if (!useSqlite)
+{
+    app.UseHangfireDashboard();
+}
 app.UseRouting();
 
 app.UseAuthentication();
