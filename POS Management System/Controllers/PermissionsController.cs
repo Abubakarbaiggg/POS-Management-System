@@ -27,16 +27,34 @@ namespace POS_Management_System.Controllers
         public async Task<IActionResult> Index()
         {
             var permissions = await _context.Permissions
-                .OrderBy(x => x.Name)
-                .ThenBy(x => x.Type)
+                .OrderBy(x => x.Id)
                 .ToListAsync();
 
             var model = permissions
-                .GroupBy(x => x.Name)
+                .Select(p =>
+                {
+                    var lastSpace = p.Name.LastIndexOf(' ');
+
+                    var groupName = lastSpace > 0
+                        ? p.Name[..lastSpace]
+                        : p.Name;
+
+                    var action = lastSpace > 0
+                        ? p.Name[(lastSpace + 1)..]
+                        : "";
+
+                    return new
+                    {
+                        Permission = p,
+                        GroupName = groupName,
+                        Action = action
+                    };
+                })
+                .GroupBy(x => x.GroupName)
                 .Select(g => new PermissionGroupViewModel
                 {
                     Name = g.Key,
-                    Permissions = g.ToList()
+                    Permissions = g.Select(x => x.Permission).ToList()
                 })
                 .ToList();
 

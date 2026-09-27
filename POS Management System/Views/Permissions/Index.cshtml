@@ -81,7 +81,7 @@
                             <th>Type</th>
                         </tr>
                     </thead>
-                    <tbody>
+                     <tbody>
                         @{
                             int i = 1;
                         }
@@ -90,28 +90,43 @@
                         {
                             <tr>
                                 <td>@i</td>
+
                                 <td class="fw-semibold">
                                     @permission.Name
                                 </td>
+
                                 <td>
                                     @foreach (var item in permission.Permissions)
                                     {
-                                        <form asp-action="Delete" method="post" style="display:inline;">
-                                            <input type="hidden" name="name" value="@permission.Name" />
-                                            <input type="hidden" name="type" value="@item.Type" />
+                                        var lastSpace = item.Name.LastIndexOf(' ');
 
-                                            <span class="badge bg-primary me-1 d-inline-flex align-items-center gap-1">
-                                                @item.Type
+                                        var action = lastSpace > 0
+                                            ? item.Name[(lastSpace + 1)..]
+                                            : item.Name;
 
-                                                <button type="submit"
-                                                        style="border:none;background:none;color:white;font-weight:bold;">
-                                                    ×
-                                                </button>
-                                            </span>
+                                        <form asp-action="Delete"
+                                              method="post"
+                                              style="display:inline;">
+
+                                            <input type="hidden"
+                                                   name="name"
+                                                   value="@item.Name" />
+
+                                            <input type="hidden"
+                                                   name="type"
+                                                   value="@item.Type" />
+
+                                            <button type="submit"
+                                                    class="badge bg-primary border-0 me-1">
+                                                @action
+                                                <span>×</span>
+                                            </button>
+
                                         </form>
                                     }
                                 </td>
                             </tr>
+
                             i++;
                         }
                     </tbody>

@@ -66,39 +66,69 @@ namespace POS_Management_System.Controllers
 
         }
 
-        public async Task<IActionResult> ManagePermissions(string id)
+       public async Task<IActionResult> ManagePermissions(string id)
         {
-            if (string.IsNullOrEmpty(id)) return NotFound();
+            if (string.IsNullOrEmpty(id))
+                return NotFound();
 
             var role = await _roleManager.FindByIdAsync(id);
-            if (role == null) return NotFound();
+
+            if (role == null)
+                return NotFound();
 
             var allPermissions = await _context.Permissions
-       .OrderBy(p => p.Name)
-       .ThenBy(p => p.Type)
-       .ToListAsync();
+                .OrderBy(p => p.Name)
+                .ThenBy(p => p.Type)
+                .ToListAsync();
 
             var assignedPermissions = (await _roleManager.GetClaimsAsync(role))
                 .Where(c => c.Type == "Permission")
                 .Select(c => c.Value)
-                .ToList();
+                .ToHashSet();
 
             var model = new RolePermissionsViewModel
             {
                 RoleId = role.Id,
                 RoleName = role.Name!,
+
                 PermissionGroups = allPermissions
-                    .GroupBy(p => p.Name)
+                    .Select(p =>
+                    {
+                        var lastSpace = p.Name.LastIndexOf(' ');
+
+                        var groupName = lastSpace > 0
+                            ? p.Name[..lastSpace]
+                            : p.Name;
+
+                        var permissionType = lastSpace > 0
+                            ? p.Name[(lastSpace + 1)..]
+                            : p.Name;
+
+                        return new
+                        {
+                            Permission = p,
+                            GroupName = groupName,
+                            PermissionType = permissionType
+                        };
+                    })
+                    .GroupBy(x => x.GroupName)
                     .Select(g => new PermissionGroupItem
                     {
                         Name = g.Key,
+
                         Types = g.Select(x => new PermissionTypeItem
                         {
-                            Id = x.Id,
-                            Type = x.Type,
-                            Selected = assignedPermissions.Contains($"{x.Name}:{x.Type}")
+                            Id = x.Permission.Id,
+                            Type = x.PermissionType,
+
+                            Selected = assignedPermissions.Contains(
+                                $"{x.Permission.Name} {x.Permission.Type}"
+                            )
+
                         }).ToList()
-                    }).ToList()
+
+                    })
+                    .ToList()
             };
 
             return View(model);
