@@ -33,6 +33,7 @@
 
             <form id="stockInForm" asp-action="Create" method="post">
                 <input type="hidden" id="productsJson" name="productsJson" />
+                <input type="hidden" id="totalAmountHidden" name="TotalAmount" />
 
                 <div class="row g-3">
 
@@ -56,102 +57,89 @@
 
                 <h5 class="mb-3">Products</h5>
 
-                <div class="row g-2 mb-3">
+                <p class="text-muted small">Click a product on the left to add it to the selection on the right. Quantity defaults to 1.</p>
 
-                    <div class="col-md-4">
-                        <select id="productSelect" class="form-select">
-                            <option value="">-- Select Product --</option>
+                <div class="row">
+                    <!-- Left: Category filter + Product Cards (rendered server-side) -->
+                    <div class="col-md-7">
+                        <div class="mb-3">
+                            <div id="categoryGroup" class="category-group">
+                                <button type="button" class="btn category-btn active" data-id="0">All</button>
+                                @if (ViewBag.Categories != null)
+                                {
+                                    foreach (var cat in ViewBag.Categories)
+                                    {
+                                        <button type="button" class="btn category-btn" data-id="@cat.Id">@cat.Name</button>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        <div id="leftProducts" class="row g-3">
                             @foreach (var product in ViewBag.Products)
                             {
-                                <option value="@product.Id"
-                                        data-price="@product.PurchasePrice"
-                                        data-name="@product.Name">
-                                    @product.Name - Stock: @product.Quantity
-                                </option>
+                                var img = string.IsNullOrEmpty(product.ImagePath) ? "/images/no-image.png" : product.ImagePath;
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <div class="card p-3 add-card product-card" style="cursor:pointer;" data-id="@product.Id" data-name="@product.Name" data-price="@product.PurchasePrice" data-image="@img" data-category="@product.CategoryId">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="@img" alt="@product.Name" class="product-img" />
+                                            <div class="product-info">
+                                                <div class="fw-semibold product-title">@product.Name</div>
+                                                <div class="text-muted small product-price">Price: @product.PurchasePrice.ToString("N2")</div>
+                                                <div class="text-muted small product-stock">Stock: @product.Quantity</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             }
-                        </select>
+                        </div>
                     </div>
 
-                    <div class="col-md-2">
-                        <input type="number" id="quantity" class="form-control" placeholder="Qty" min="1" />
-                    </div>
+                    <!-- Right: Selected list, quantity controls, totals -->
+                    <div class="col-md-5">
+                        <div class="panel p-3">
+                            <h6 class="mb-3">Selected Products</h6>
 
-                    <div class="col-md-2">
-                        <input type="number" id="price" class="form-control" placeholder="Price" step="0.01" />
-                    </div>
-
-                    <div class="col-md-2">
-                        <button type="button" id="addProductBtn" class="btn btn-success w-100">
-                            <i class="bi bi-plus-circle"></i> Add
-                        </button>
-                    </div>
-
-                </div>
-
-                <div class="table-responsive panel">
-
-                    <table class="table align-middle mb-0" id="productsTable">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Qty</th>
-                                <th>Price</th>
-                                <th>Total</th>
-                                <th class="text-end">Action</th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="productsTableBody"></tbody>
-
-                        <tfoot>
-                            <tr>
-                                <th colspan="3" class="text-end">Grand Total:</th>
-                                <th id="grandTotal">0.00</th>
-                                <th></th>
-                            </tr>
-                        </tfoot>
-
-                        <div class="row mt-4">
-
-                            <div class="col-md-4">
-                                <label>Total Amount</label>
-                                <input id="totalAmount"
-                                       class="form-control"
-                                       readonly />
+                            <div class="table-responsive">
+                                <table class="table align-middle mb-0" id="selectedTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th style="width:90px">Qty</th>
+                                            <th>Price</th>
+                                            <th>Total</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="selectedBody"></tbody>
+                                </table>
                             </div>
 
-                            <div class="col-md-4">
-                                <label>Paid Amount</label>
-                                <input id="paidAmount"
-                                       name="PaidAmount"
-                                       class="form-control"
-                                       type="number" />
-                            </div>
+                            <div class="row mt-3 g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label">Total Amount</label>
+                                    <input id="totalAmount" name="TotalAmount" class="form-control" readonly />
+                                </div>
 
-                            <div class="col-md-4">
-                                <label>Payment Method</label>
+                                <div class="col-md-6">
+                                    <label class="form-label">Paid Amount</label>
+                                    <input id="paidAmount" name="PaidAmount" class="form-control" type="number" step="0.01" />
+                                </div>
 
-                                <select name="PaymentMethod"
-                                        class="form-select">
-
-                                    <option>Cash</option>
-                                    <option>Card</option>
-                                    <option>Bank Transfer</option>
-                                    <option>JazzCash</option>
-                                    <option>EasyPaisa</option>
-
-                                </select>
-
+                                <div class="col-md-12 mt-2">
+                                    <label class="form-label">Payment Method</label>
+                                    <select name="PaymentMethod" class="form-select">
+                                        <option>Cash</option>
+                                        <option>Card</option>
+                                        <option>Bank Transfer</option>
+                                        <option>JazzCash</option>
+                                        <option>EasyPaisa</option>
+                                    </select>
+                                </div>
                             </div>
 
                         </div>
-
-    
-
-
-
-                    </table>
-
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-end gap-2 mt-4">
@@ -165,98 +153,42 @@
 
         </section>
     </div>
-                @section Scripts {
-                <script>
-                        let products = [];
+    <style>
+        /* Category group - horizontal scrollable pills */
+        .category-group { display:flex; gap:8px; overflow-x:auto; padding:6px 4px; }
+        .category-group::-webkit-scrollbar { height:6px; }
+        .category-group .btn { white-space:nowrap; border-radius:8px; border:1px solid #cfe2ff; padding:6px 12px; background:#fff; color:#0d6efd; }
+        .category-btn.active { background-color:#0d6efd; color:#fff; box-shadow:0 6px 18px rgba(13,110,253,0.08); }
 
-                        document.getElementById("addProductBtn").addEventListener("click", function () {
+        /* Product cards */
+        .product-card { transition: box-shadow .12s, transform .08s, border-color .08s; border-radius:10px; border:1px solid #eef3fb; background:#fff; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(2,6,23,0.06); }
+        .product-card.selected-card { border:2px solid #0d6efd; background-color:#e9f6ff; }
+        .product-img { width:56px; height:56px; object-fit:cover; border-radius:8px; }
+        .product-info { min-height:56px; }
+        .product-title { font-size:0.95rem; }
+        .product-price, .product-stock { margin-top:4px; }
 
-                            let productSelect = document.getElementById("productSelect");
-                            let quantity = parseInt(document.getElementById("quantity").value);
-                            let price = parseFloat(document.getElementById("price").value);
+        /* Right panel */
+        .panel.p-3 { border-radius:10px; box-shadow:0 8px 28px rgba(2,6,23,0.04); background:#fff; }
+        #selectedTable tbody tr td { vertical-align: middle; }
+        #selectedBody { max-height: 420px; overflow:auto; display:block; }
+        #selectedTable { width:100%; }
+        #selectedTable tbody { display:block; }
+        #selectedTable thead, #selectedTable tbody tr { display:table; width:100%; table-layout:fixed; }
+        #selectedTable thead { width:100%; }
+        .qty-input { max-width:90px; }
 
-                            if (!productSelect.value) {
-                                alert("Please select a product");
-                                return;
-                            }
-
-                            if (!quantity || quantity <= 0) {
-                                alert("Enter valid quantity");
-                                return;
-                            }
-
-                            if (!price || price <= 0) {
-                                alert("Enter valid price");
-                                return;
-                            }
-
-                            let productId = parseInt(productSelect.value);
-                            let productName =
-                                productSelect.options[productSelect.selectedIndex].dataset.name;
-
-                            let total = quantity * price;
-
-                            let item = {
-                                productId: productId,
-                                productName: productName,
-                                quantity: quantity,
-                                purchasePrice: price,
-                                total: total
-                            };
-
-                            products.push(item);
-
-                            renderTable();
-
-                            document.getElementById("productsJson").value =
-                                JSON.stringify(products);
-
-                            document.getElementById("quantity").value = "";
-                            document.getElementById("price").value = "";
-                            document.getElementById("productSelect").selectedIndex = 0;
-                        });
-
-                        function renderTable() {
-
-                            let tbody = document.getElementById("productsTableBody");
-                            tbody.innerHTML = "";
-
-                            let grandTotal = 0;
-
-                            products.forEach((item, index) => {
-
-                                grandTotal += item.total;
-
-                                tbody.innerHTML += `
-                                    <tr>
-                                        <td>${item.productName}</td>
-                                        <td>${item.quantity}</td>
-                                        <td>${item.purchasePrice.toFixed(2)}</td>
-                                        <td>${item.total.toFixed(2)}</td>
-                                        <td class="text-end">
-                                            <button type="button"
-                                                    class="btn btn-danger btn-sm"
-                                                    onclick="removeProduct(${index})">
-                                                Remove
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `;
-                            });
-
-                            document.getElementById("grandTotal").innerText =
-                                grandTotal.toFixed(2);
-                    document.getElementById("totalAmount").value =
-                                                    grandTotal.toFixed(2);
-
-                            document.getElementById("productsJson").value =
-                                JSON.stringify(products);
-                        }
-
-                        function removeProduct(index) {
-                            products.splice(index, 1);
-                            renderTable();
-                        }
-            </script>
+        /* responsive spacing */
+        &#64;media (max-width:767px) {
+        .category-group { gap:6px; }
+        #selectedBody { max-height:200px; }
         }
+        </style>
+    <link rel="stylesheet" href="~/css/stockin.css" asp-append-version="true" />
+
+    @section Scripts {
+        <script src="~/js/stockin.js" asp-append-version="true"></script>
+    }
+
 </main>

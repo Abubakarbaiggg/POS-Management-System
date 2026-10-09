@@ -8,7 +8,7 @@ COPY ["POS Management System.csproj", "./"]
 RUN dotnet restore "POS Management System.csproj"
 COPY . .
 RUN dotnet publish "POS Management System.csproj" -c Release -o /app/publish
-
+	
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .

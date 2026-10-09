@@ -42,6 +42,7 @@ namespace POS_Management_System.Controllers
         {
             ViewBag.Suppliers = new SelectList(await _context.Suppliers.ToListAsync(), "Id", "Name");
             ViewBag.Products = await _context.Products.ToListAsync();
+            ViewBag.Categories = await _context.Categories.ToListAsync();
 
             return View(new StockInViewModel
             {
@@ -162,6 +163,7 @@ namespace POS_Management_System.Controllers
         {
             ViewBag.Suppliers = new SelectList(await _context.Suppliers.ToListAsync(), "Id", "Name", model.SupplierId);
             ViewBag.Products = await _context.Products.ToListAsync();
+            ViewBag.Categories = await _context.Categories.ToListAsync();
         }
         public async Task<IActionResult> Details(int id)
         {

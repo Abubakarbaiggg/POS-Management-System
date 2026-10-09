@@ -1,0 +1,36 @@
+/* StockIn page custom styles */
+
+/* Category group - horizontal scrollable pills */
+.category-group { display:flex; gap:8px; overflow-x:auto; padding:6px 4px; }
+.category-group::-webkit-scrollbar { height:6px; }
+.category-group .btn { white-space:nowrap; border-radius:8px; border:1px solid #cfe2ff; padding:6px 12px; background:#fff; color:#0d6efd; }
+.category-btn.active { background-color:#0d6efd; color:#fff; box-shadow:0 6px 18px rgba(13,110,253,0.08); }
+
+/* Product cards */
+.product-card { transition: box-shadow .12s, transform .08s, border-color .08s; border-radius:10px; border:1px solid #eef3fb; background:#fff; }
+.product-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(2,6,23,0.06); }
+.product-card.selected-card {
+    border: 2px solid #0d6efd;
+    background-color: #e9f6ff;
+    box-shadow: 0 8px 20px rgba(13,110,253,0.08);
+}
+.product-img { width:56px; height:56px; object-fit:cover; border-radius:8px; }
+.product-info { min-height:56px; }
+.product-title { font-size:0.95rem; }
+.product-price, .product-stock { margin-top:4px; }
+
+/* Right panel */
+.panel.p-3 { border-radius:10px; box-shadow:0 8px 28px rgba(2,6,23,0.04); background:#fff; }
+#selectedTable tbody tr td { vertical-align: middle; }
+#selectedBody { max-height: 420px; overflow:auto; display:block; }
+#selectedTable { width:100%; }
+#selectedTable tbody { display:block; }
+#selectedTable thead, #selectedTable tbody tr { display:table; width:100%; table-layout:fixed; }
+#selectedTable thead { width:100%; }
+.qty-input { max-width:90px; }
+
+/* responsive spacing */
+@media (max-width:767px) {
+    .category-group { gap:6px; }
+    #selectedBody { max-height:200px; }
+}
