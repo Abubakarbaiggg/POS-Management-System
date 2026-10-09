@@ -16,15 +16,7 @@ var useSqlite = connectionString.StartsWith("Data Source=", StringComparison.Ord
                 || connectionString.EndsWith(".db", StringComparison.OrdinalIgnoreCase)
                 || connectionString.Contains(".sqlite", StringComparison.OrdinalIgnoreCase);
 
-if (useSqlite)
-{
-    builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connectionString));
-}
-else
-{
-    builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
-}
-
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;

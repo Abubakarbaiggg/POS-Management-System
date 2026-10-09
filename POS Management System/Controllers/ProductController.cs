@@ -39,7 +39,7 @@ namespace POS_Management_System.Controllers
             {
                 if(ImageFile != null && ImageFile.Length > 0)
                 {
-                    string uploadsFolder = Path.Combine(_webHostEnviroment.WebRootPath, "images/products");
+                    string uploadsFolder = Path.Combine(_webHostEnviroment.WebRootPath, "images/products/");
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
@@ -92,7 +92,7 @@ namespace POS_Management_System.Controllers
                                 System.IO.File.Delete(OldImagePath);
                             }
                         }
-                        string uploadFolder = Path.Combine(_webHostEnviroment.WebRootPath, "images/products");
+                        string uploadFolder = Path.Combine(_webHostEnviroment.WebRootPath, "images/products/");
                         if (!Directory.Exists(uploadFolder))
                         {
                             Directory.CreateDirectory(uploadFolder);
@@ -103,7 +103,7 @@ namespace POS_Management_System.Controllers
                         {
                             await ImageFile.CopyToAsync(fileStram);
                         }
-                        product.ImagePath = "/images/products" + uniqueFileName;
+                        product.ImagePath = "/images/products/" + uniqueFileName;
                     }
                     _context.Update(product);
                     await _context.SaveChangesAsync();
