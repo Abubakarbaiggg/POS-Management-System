@@ -53,100 +53,7 @@
 
         </div>
 
-        <!-- Summary Cards -->
-
-        <div class="row mt-4">
-
-            <div class="col-lg-3 col-md-6 mb-3">
-
-                <div class="card shadow-sm border-0">
-
-                    <div class="card-body">
-
-                        <small class="text-muted">
-                            Total Invoices
-                        </small>
-
-                        <h3 class="fw-bold mt-2">
-                            @ViewBag.TotalInvoices
-                        </h3>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="col-lg-3 col-md-6 mb-3">
-
-                <div class="card shadow-sm border-0">
-
-                    <div class="card-body">
-
-                        <small class="text-muted">
-                            Total Sales
-                        </small>
-
-                        <h3 class="text-primary fw-bold mt-2">
-
-                            Rs.
-                            @(((decimal)ViewBag.TotalSales).ToString("N2"))
-
-                        </h3>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="col-lg-3 col-md-6 mb-3">
-
-                <div class="card shadow-sm border-0">
-
-                    <div class="card-body">
-
-                        <small class="text-muted">
-                            Total Paid
-                        </small>
-
-                        <h3 class="text-success fw-bold mt-2">
-
-                            Rs.
-                            @(((decimal)ViewBag.TotalPaid).ToString("N2"))
-
-                        </h3>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="col-lg-3 col-md-6 mb-3">
-
-                <div class="card shadow-sm border-0">
-
-                    <div class="card-body">
-
-                        <small class="text-muted">
-                            Remaining
-                        </small>
-
-                        <h3 class="text-danger fw-bold mt-2">
-
-                            Rs.
-                            @(((decimal)ViewBag.TotalRemaining).ToString("N2"))
-
-                        </h3>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
+        <!-- Summary cards moved to Dashboard -->
 
         <!-- Filter -->
 
@@ -287,6 +194,10 @@
 
                             <th>Products</th>
 
+                            <th>Quantity</th>
+
+                            <th>Price</th>
+
                             <th>Total</th>
 
                             <th>Paid</th>
@@ -323,25 +234,37 @@
                                         @(item.Customer?.Name ?? "Walk In Customer")
                                     </td>
 
-                                    <td>
+                                    @{
+                                        // Prepare comma separated values for quantities and prices
+                                        var quantities = string.Join(", ", item.StockOutDetails?.Select(d => d.Quantity.ToString()) ?? new string[0]);
+                                        var prices = string.Join(", ", item.StockOutDetails?.Select(d => ("Rs. " + d.UnitPrice.ToString("N2"))) ?? new string[0]);
+                                    }
 
+                                    <td>
                                         <ul class="mb-0 ps-3">
                                             @foreach (var detail in item.StockOutDetails!)
                                             {
                                                 <li>
                                                     <strong>@detail.Product?.Name</strong>
-                                                    <span class="badge bg-primary ms-2">
-                                                        Qty : @detail.Quantity
-                                                    </span>
-
-                                                    <span class="text-muted">
-                                                        (Rs. @detail.UnitPrice.ToString("N2"))
-                                                    </span>
                                                 </li>
                                             }
 
                                         </ul>
 
+                                    </td>
+
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(quantities))
+                                        {
+                                            <span>@quantities</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(prices))
+                                        {
+                                            <span>@prices</span>
+                                        }
                                     </td>
 
                                     <td>
@@ -407,7 +330,7 @@
                         {
                             <tr>
 
-                                <td colspan="9" class="text-center py-5">
+                                <td colspan="11" class="text-center py-5">
 
                                     <i class="bi bi-inbox fs-1 text-muted"></i>
 
@@ -429,46 +352,6 @@
                         }
 
                     </tbody>
-
-                    <tfoot>
-
-                        <tr>
-
-                            <th colspan="4" class="text-end">
-
-                                Grand Total
-
-                            </th>
-
-                            <th>
-
-                                Rs.
-                                @(((decimal)ViewBag.TotalSales).ToString("N2"))
-
-                            </th>
-
-                            <th>
-
-                                Rs.
-                                @(((decimal)ViewBag.TotalPaid).ToString("N2"))
-
-                            </th>
-
-                            <th>
-
-                                Rs.
-                                @(((decimal)ViewBag.TotalRemaining).ToString("N2"))
-
-                            </th>
-
-                            <th></th>
-
-                            <th></th>
-
-                        </tr>
-
-                    </tfoot>
-
                 </table>
 
             </div>

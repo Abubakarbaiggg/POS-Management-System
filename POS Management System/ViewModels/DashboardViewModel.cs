@@ -11,6 +11,12 @@
         public decimal TodaySales { get; set; }
         public decimal MonthlySales { get; set; }
 
+        // Stock out summary (moved from StockReport view)
+        public int TotalInvoices { get; set; }
+        public decimal TotalSales { get; set; }
+        public decimal TotalPaid { get; set; }
+        public decimal TotalRemaining { get; set; }
+
         public decimal MonthlyStockIn { get; set; }
 
         public decimal TotalStockIn { get; set; }

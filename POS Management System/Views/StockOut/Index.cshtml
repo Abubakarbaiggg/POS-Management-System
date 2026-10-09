@@ -87,14 +87,16 @@
                                 <td class="text-end">
                                     <a asp-action="Details"
                                        asp-route-id="@item.Id"
-                                       class="btn btn-sm btn-info">
-                                        Details
+                                       class="btn btn-sm btn-info"
+                                       title="Details" aria-label="Details">
+                                        <i class="bi bi-eye"></i>
                                     </a>
 
                                     <a asp-action="Delete"
                                        asp-route-id="@item.Id"
-                                       class="btn btn-sm btn-danger">
-                                        Delete
+                                       class="btn btn-sm btn-danger"
+                                       title="Delete" aria-label="Delete">
+                                        <i class="bi bi-trash"></i>
                                     </a>
                                 </td>
                             </tr>

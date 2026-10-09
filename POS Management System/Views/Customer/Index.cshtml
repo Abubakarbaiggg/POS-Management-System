@@ -75,14 +75,16 @@
                                 <td class="text-end">
                                     <a asp-action="Edit"
                                        asp-route-id="@item.Id"
-                                       class="btn btn-sm btn-warning">
-                                        Edit
+                                       class="btn btn-sm btn-warning"
+                                       title="Edit" aria-label="Edit">
+                                        <i class="bi bi-pencil"></i>
                                     </a>
 
                                     <a asp-action="Delete"
                                        asp-route-id="@item.Id"
-                                       class="btn btn-sm btn-danger">
-                                        Delete
+                                       class="btn btn-sm btn-danger"
+                                       title="Delete" aria-label="Delete">
+                                        <i class="bi bi-trash"></i>
                                     </a>
                                 </td>
                             </tr>

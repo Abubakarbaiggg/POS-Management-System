@@ -61,6 +61,12 @@ namespace POS_Management_System.Controllers
                 TotalStockOut = await _context.StockOutDetails.SumAsync(x => (decimal?)x.Total) ?? 0
             };
 
+            // Aggregate overall invoice/payment totals for dashboard cards
+            model.TotalInvoices = await _context.StockOuts.CountAsync();
+            model.TotalSales = await _context.CustomerPayments.SumAsync(x => (decimal?)x.TotalAmount) ?? 0;
+            model.TotalPaid = await _context.CustomerPayments.SumAsync(x => (decimal?)x.PaidAmount) ?? 0;
+            model.TotalRemaining = await _context.CustomerPayments.SumAsync(x => (decimal?)x.RemainingAmount) ?? 0;
+
             return View(model);
         }
 

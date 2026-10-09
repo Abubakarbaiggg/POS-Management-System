@@ -46,6 +46,100 @@
 
         </section>
 
+        <!-- Stock Report Summary Cards -->
+        <section class="row g-3 mt-4">
+
+            <div class="col-lg-3 col-md-6 mb-3">
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Total Invoices
+                        </small>
+
+                        <h3 class="fw-bold mt-2">
+                            @Model.TotalInvoices
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-3">
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Total Sales
+                        </small>
+
+                        <h3 class="text-primary fw-bold mt-2">
+
+                            Rs.
+                            @Model.TotalSales.ToString("N2")
+
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-3">
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Total Paid
+                        </small>
+
+                        <h3 class="text-success fw-bold mt-2">
+
+                            Rs.
+                            @Model.TotalPaid.ToString("N2")
+
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-3">
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Remaining
+                        </small>
+
+                        <h3 class="text-danger fw-bold mt-2">
+
+                            Rs.
+                            @Model.TotalRemaining.ToString("N2")
+
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
         <!-- Charts Row -->
         <section class="row g-3 mt-3">
 
