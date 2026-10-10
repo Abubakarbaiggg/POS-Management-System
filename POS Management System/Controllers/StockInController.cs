@@ -26,7 +26,7 @@ namespace POS_Management_System.Controllers
 
         public async Task<IActionResult> Index(int page=1)
         {
-            int pageSize = 5;
+            int pageSize = 10;
             var stockIns = await PaginatedList<StockIn>.CreateAsync(
                 _context.StockIns
                 .Include(s => s.Supplier)
