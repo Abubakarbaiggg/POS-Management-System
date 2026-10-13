@@ -8,30 +8,19 @@
 <main class="dashboard-content">
     <div class="container-fluid px-3 px-lg-4 py-4">
 
-        <!-- Page Heading -->
         <div class="page-heading">
             <div class="page-heading-copy">
-                <span class="page-icon">
-                    <i class="bi bi-cart-dash"></i>
-                </span>
+                <span class="page-icon"><i class="bi bi-cart-dash"></i></span>
                 <div>
                     <p class="eyebrow mb-1">Sales</p>
                     <h1 class="h3 mb-1">New Stock Out</h1>
                     <p class="text-muted mb-0">Create customer sale invoice and stock deduction.</p>
                 </div>
             </div>
-
-            <div class="heading-actions">
-                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
-                    Back
-                </a>
-            </div>
         </div>
 
-        <!-- Panel -->
         <section class="panel">
 
-            <!-- Header -->
             <div class="panel-header">
                 <div>
                     <h2 class="h5 mb-1 section-title">
@@ -44,6 +33,7 @@
 
             <form id="stockOutForm" asp-action="Create" method="post">
                 <input type="hidden" id="productsJson" name="productsJson" />
+                <input type="hidden" id="totalAmountHidden" name="TotalAmount" />
 
                 <div class="row g-3">
 
@@ -67,208 +57,107 @@
 
                 <h5 class="mb-3">Products</h5>
 
-                <div class="row g-2 mb-3">
+                <p class="text-muted small">Click a product on the left to add it to the selection on the right. Quantity defaults to 1.</p>
 
-                    <div class="col-md-4">
-                        <select id="productSelect" class="form-select">
-                            <option value="">-- Select Product --</option>
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="mb-3">
+                            <div id="categoryGroup" class="category-group">
+                                <button type="button" class="btn category-btn active" data-id="0">All</button>
+                                @if (ViewBag.Categories != null)
+                                {
+                                    foreach (var cat in ViewBag.Categories)
+                                    {
+                                        <button type="button" class="btn category-btn" data-id="@cat.Id">@cat.Name</button>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        <div id="leftProducts" class="row g-3">
                             @foreach (var product in ViewBag.Products)
                             {
-                                <option value="@product.Id"
-                                        data-price="@product.SalePrice"
-                                        data-name="@product.Name">
-                                    @product.Name - Stock: @product.Quantity
-                                </option>
+                                var img = string.IsNullOrEmpty(product.ImagePath) ? "/images/no-image.png" : product.ImagePath;
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <div class="card p-3 add-card product-card" style="cursor:pointer;" data-id="@product.Id" data-name="@product.Name" data-price="@product.SalePrice" data-image="@img" data-category="@product.CategoryId">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="@img" alt="@product.Name" class="product-img" />
+                                            <div class="product-info">
+                                                <div class="fw-semibold product-title">@product.Name</div>
+                                                <div class="text-muted small product-price">Price: @product.SalePrice.ToString("N2")</div>
+                                                <div class="text-muted small product-stock">Stock: @product.Quantity</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             }
-                        </select>
+                        </div>
                     </div>
 
-                    <div class="col-md-2">
-                        <input type="number" id="quantity" class="form-control" placeholder="Qty" min="1" />
-                    </div>
+                    <div class="col-md-5">
+                        <div class="panel p-3">
+                            <h6 class="mb-3">Selected Products</h6>
 
-                    <div class="col-md-2">
-                        <input type="number" id="price" class="form-control" placeholder="Price" step="0.01" />
-                    </div>
-
-                    <div class="col-md-2">
-                        <button type="button" id="addProductBtn" class="btn btn-success w-100">
-                            <i class="bi bi-plus-circle"></i> Add
-                        </button>
-                    </div>
-
-                </div>
-
-                <!-- Table -->
-                <div class="table-responsive panel">
-
-                    <table class="table align-middle mb-0" id="productsTable">
-
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Qty</th>
-                                <th>Unit Price</th>
-                                <th>Total</th>
-                                <th class="text-end">Action</th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="productsTableBody"></tbody>
-
-                        <tfoot>
-                            <tr>
-                                <th colspan="3" class="text-end">Grand Total:</th>
-                                <th id="grandTotal" class="fw-bold text-success">0.00</th>
-                                <th></th>
-                            </tr>
-                        </tfoot>
-
-                        <div class="row mt-4">
-
-                            <div class="col-md-4">
-                                <label>Total Amount</label>
-                                <input id="totalAmount"
-                                       class="form-control"
-                                       readonly />
+                            <div class="table-responsive">
+                                <table class="table align-middle mb-0" id="selectedTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th style="width:90px">Qty</th>
+                                            <th>Price</th>
+                                            <th>Total</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="selectedBody"></tbody>
+                                </table>
                             </div>
 
-                            <div class="col-md-4">
-                                <label>Paid Amount</label>
-                                <input id="paidAmount"
-                                       name="PaidAmount"
-                                       class="form-control"
-                                       type="number" />
+                            <div class="row mt-3 g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label">Total Amount</label>
+                                    <input id="totalAmount" name="TotalAmount" class="form-control" readonly />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Paid Amount</label>
+                                    <input id="paidAmount" name="PaidAmount" class="form-control" type="number" step="0.01" />
+                                </div>
+
+                                <div class="col-md-12 mt-2">
+                                    <label class="form-label">Payment Method</label>
+                                    <select name="PaymentMethod" class="form-select">
+                                        <option>Cash</option>
+                                        <option>Card</option>
+                                        <option>Bank Transfer</option>
+                                        <option>JazzCash</option>
+                                        <option>EasyPaisa</option>
+                                    </select>
+                                </div>
+
                             </div>
 
-                            <div class="col-md-4">
-                                <label>Payment Method</label>
-
-                                <select name="PaymentMethod"
-                                        class="form-select">
-
-                                    <option>Cash</option>
-                                    <option>Card</option>
-                                    <option>Bank Transfer</option>
-                                    <option>JazzCash</option>
-                                    <option>EasyPaisa</option>
-
-                                </select>
-
+                            <div class="d-flex justify-content-end mt-3">
+                                <a asp-action="Index" class="btn btn-outline-secondary me-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle"></i> Save Stock Out
+                                </button>
                             </div>
 
                         </div>
-
-                    </table>
-
-                </div>
-
-                <!-- Buttons -->
-                <div class="d-flex justify-content-end gap-2 mt-4">
-                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-circle"></i> Save Stock Out
-                    </button>
+                    </div>
                 </div>
 
             </form>
 
         </section>
-                       @section Scripts {
-        <script>
 
-                       
-
-                                let products = [];
-
-                                document.getElementById("addProductBtn").addEventListener("click", function () {
-
-                                    let productSelect = document.getElementById("productSelect");
-                                    let quantity = parseInt(document.getElementById("quantity").value);
-                                    let price = parseFloat(document.getElementById("price").value);
-
-                                    if (!productSelect.value) {
-                                        alert("Please select a product");
-                                        return;
-                                    }
-
-                                    if (!quantity || quantity <= 0) {
-                                        alert("Please enter valid quantity");
-                                        return;
-                                    }
-
-                                    if (!price || price <= 0) {
-                                        alert("Please enter valid price");
-                                        return;
-                                    }
-
-                                    let productId = parseInt(productSelect.value);
-                                    let productName =
-                                        productSelect.options[productSelect.selectedIndex].dataset.name;
-
-                                    let total = quantity * price;
-
-                                    let item = {
-                                        productId: productId,
-                                        productName: productName,
-                                        quantity: quantity,
-                                        unitPrice: price,
-                                        total: total
-                                    };
-
-                                    products.push(item);
-
-                                    renderTable();
-
-                                    document.getElementById("quantity").value = "";
-                                    document.getElementById("price").value = "";
-                                    document.getElementById("productSelect").selectedIndex = 0;
-                                });
-
-                                function renderTable() {
-
-                                    let tbody = document.getElementById("productsTableBody");
-                                    tbody.innerHTML = "";
-
-                                    let grandTotal = 0;
-
-                                    products.forEach((item, index) => {
-
-                                        grandTotal += item.total;
-
-                                        tbody.innerHTML += `
-                                            <tr>
-                                                <td>${item.productName}</td>
-                                                <td>${item.quantity}</td>
-                                                <td>${item.unitPrice.toFixed(2)}</td>
-                                                <td>${item.total.toFixed(2)}</td>
-                                                <td class="text-end">
-                                                    <button type="button"
-                                                            class="btn btn-danger btn-sm"
-                                                            onclick="removeProduct(${index})">
-                                                        Remove
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        `;
-                                    });
-
-                                    document.getElementById("grandTotal").innerText =
-                                        grandTotal.toFixed(2);
-                                    document.getElementById("totalAmount").value =
-                                    grandTotal.toFixed(2);
-
-                                    document.getElementById("productsJson").value =
-                                        JSON.stringify(products);
-                                }
-
-                                function removeProduct(index) {
-                                    products.splice(index, 1);
-                                    renderTable();  
-                                }
-
-
-        </script>
-                }
     </div>
 </main>
+
+    <link rel="stylesheet" href="~/css/stockin.css" asp-append-version="true" />
+
+@section Scripts {
+    <script src="~/js/stockin.js" asp-append-version="true"></script>
+}
+    
