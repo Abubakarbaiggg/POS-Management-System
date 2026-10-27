@@ -1,5 +1,144 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model POS_Management_System.Models.ViewModels.CreateUserViewModel
+
 @{
+    ViewData["Title"] = "Create User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <!-- PAGE HEADER -->
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-person-plus" aria-hidden="true"></i>
+                </span>
+
+                <div>
+                    <p class="eyebrow mb-1">Cashier Management</p>
+                    <h1 class="h3 mb-1">Create Cashier Shift</h1>
+                    <p class="text-muted mb-0">
+                        Add a new user account to the system.
+                    </p>
+                </div>
+            </div>
+
+            <div class="heading-actions">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+
+        <section class="row g-3">
+
+            <!-- FORM SECTION -->
+            <div class="col-12">
+
+                <form asp-action="Create" method="post" class="panel">
+
+                    <div class="panel-header">
+                        <div>
+                            <h2 class="h5 mb-1 section-title">
+                                <i class="bi bi-person-gear"></i>
+                                <span>User Information</span>
+                            </h2>
+                            <p class="text-muted mb-0">
+                                Fill in the user details below.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-3">
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row g-3">
+
+                            <!-- Username -->
+                            <div class="col-md-6">
+                                <label asp-for="UserName" class="form-label"></label>
+
+                                <input asp-for="UserName"
+                                       class="form-control"
+                                       placeholder="Enter username" />
+
+                                <span asp-validation-for="UserName" class="text-danger"></span>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label"></label>
+
+                                <input asp-for="Email"
+                                       class="form-control"
+                                       placeholder="Enter email address" />
+
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+
+                            <!-- Phone -->
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label"></label>
+
+                                <input asp-for="PhoneNumber"
+                                       class="form-control"
+                                       placeholder="Enter phone number" />
+
+                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            </div>
+
+                            <!-- Password -->
+                            <div class="col-md-6">
+                                <label asp-for="Password" class="form-label"></label>
+
+                                <input asp-for="Password"
+                                       type="password"
+                                       class="form-control"
+                                       placeholder="Enter password" />
+
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div class="col-md-6">
+                                <label asp-for="ConfirmPassword" class="form-label"></label>
+
+                                <input asp-for="ConfirmPassword"
+                                       type="password"
+                                       class="form-control"
+                                       placeholder="Confirm password" />
+
+                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="d-flex justify-content-end gap-2 p-3 border-top">
+
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check2-circle"></i> Create User
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </div>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }
