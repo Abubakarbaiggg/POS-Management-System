@@ -32,7 +32,7 @@ namespace POS_Management_System.Controllers
             {
                 query = query.Where(x =>
                     x.Customer!.Name.Contains(search) ||
-                    x.StockOutDetails.Any(d => d.Product!.Name.Contains(search)));
+                    x.StockOutDetails!.Any(d => d.Product!.Name.Contains(search)));
             }
             var data = await query.OrderByDescending(x => x.Date).ToListAsync();
             ViewBag.Customers = new SelectList(

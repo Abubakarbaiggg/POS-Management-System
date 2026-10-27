@@ -5,7 +5,6 @@ using POS_Management_System.Data;
 using POS_Management_System.Models;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using ClosedXML.Excel;
 
 
 public class SaleReportController : Controller

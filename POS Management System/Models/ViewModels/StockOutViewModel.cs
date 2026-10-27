@@ -17,7 +17,7 @@ namespace POS_Management_System.Models.ViewModels
 
         public PaymentMethod PaymentMethod { get; set; }
 
-        public List<StockOutProductItem> Products { get; set; }
+        public List<StockOutProductItem> Products { get; set; } = new List<StockOutProductItem>();
     }
 
     public class StockOutProductItem

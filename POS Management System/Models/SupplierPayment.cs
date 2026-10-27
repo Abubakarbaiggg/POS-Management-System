@@ -24,7 +24,7 @@ namespace POS_Management_System.Models
         public PaymentMethod PaymentMethod { get; set; }
 
         public DateTime PaymentDate { get; set; } = DateTime.Now;
-        public virtual StockIn StockIn { get; set; }
+        public virtual StockIn StockIn { get; set; } = new StockIn();
 
     }
 }

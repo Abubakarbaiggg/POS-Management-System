@@ -7,7 +7,6 @@ using System.Data;
 using System.Security.Claims;
 using POS_Management_System.Models;
 using POS_Management_System.Models.ViewModels;
-using System.Security.Claims;
 
 namespace POS_Management_System.Controllers
 {
@@ -140,6 +139,7 @@ namespace POS_Management_System.Controllers
         public async Task<IActionResult> UpdateRolePermissions(string roleId, int[]? selectedPermissionIds)
         {
             var role = await _roleManager.FindByIdAsync(roleId);
+            if(role == null) return NotFound();
 
             var existingClaims = await _roleManager.GetClaimsAsync(role);
 

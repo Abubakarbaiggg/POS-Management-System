@@ -24,7 +24,7 @@ namespace POS_Management_System.Models
         public PaymentMethod PaymentMethod { get; set; }
 
         public DateTime PaymentDate { get; set; } = DateTime.Now;
-        public virtual StockOut StockOut { get; set; }
+        public virtual StockOut StockOut { get; set; } = new StockOut();
 
     }
     public enum PaymentMethod

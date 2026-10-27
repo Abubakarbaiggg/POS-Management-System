@@ -18,6 +18,6 @@ namespace POS_Management_System.Models
         public virtual Supplier? Supplier { get; set; }
         public virtual SupplierPayment? SupplierPayment { get; set; }
 
-        public virtual ICollection<StockInDetail>? StockInDetails { get; set; }
+        public virtual ICollection<StockInDetail> StockInDetails { get; set; } = new List<StockInDetail>();
     }
 }

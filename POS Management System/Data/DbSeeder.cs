@@ -152,6 +152,11 @@ namespace POS_Management_System.Data
         {
             var role = await roleManager.FindByNameAsync(roleName);
 
+            if (role == null)
+            {
+                return;
+            }
+
             var existingClaims = await roleManager.GetClaimsAsync(role);
 
             foreach (var permissionName in permissionNames)

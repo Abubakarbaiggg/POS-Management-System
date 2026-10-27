@@ -96,6 +96,13 @@
                 <span class="nav-text">Users</span>
             </a>
         }
+
+        <a class="nav-link @(currentController == "CashierShift" ? "active" : "")"
+           asp-controller="CashierShift" asp-action="Index">
+            <span class="nav-icon"><i class="bi bi-person-circle"></i></span>
+            <span class="nav-text">Cashier Shift</span>
+        </a>
+
         <div class="nav-item">
 
             <a class="nav-link d-flex justify-content-between align-items-center"

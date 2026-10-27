@@ -18,6 +18,6 @@ namespace POS_Management_System.Models
         public virtual Customer? Customer { get; set; }
         public virtual CustomerPayment? CustomerPayment { get; set; }
 
-        public virtual ICollection<StockOutDetail>? StockOutDetails { get; set; }
+        public virtual ICollection<StockOutDetail> StockOutDetails { get; set; } = new List<StockOutDetail>();
     }
 }

@@ -23,6 +23,8 @@ namespace POS_Management_System.Data
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<CustomerPayment> CustomerPayments { get; set; }
         public DbSet<SupplierPayment> SupplierPayments { get; set; }
+        public DbSet<WorkShifts> WorkShifts { get; set; }
+        public DbSet<CashierAttendance> CashierAttendances { get; set; }
 
     }
 }

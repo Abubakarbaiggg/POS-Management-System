@@ -46,15 +46,15 @@ namespace POS_Management_System.Controllers
                 LowStockCount = await _context.Products.CountAsync(p => p.Quantity < 5),
 
                 TodaySales = await _context.StockOutDetails
-                    .Where(x => x.StockOut.Date.Date == today)
+                    .Where(x => x.StockOut != null && x.StockOut.Date.Date == today)
                     .SumAsync(x => (decimal?)x.Total) ?? 0,
 
                 MonthlySales = await _context.StockOutDetails
-                    .Where(x => x.StockOut.Date >= startOfMonth)
+                    .Where(x => x.StockOut != null && x.StockOut.Date >= startOfMonth)
                     .SumAsync(x => (decimal?)x.Total) ?? 0,
 
                 MonthlyStockIn = await _context.StockInDetails
-                    .Where(x => x.StockIn.Date >= startOfMonth)
+                    .Where(x => x.StockIn != null && x.StockIn.Date >= startOfMonth)
                     .SumAsync(x => (decimal?)x.Total) ?? 0,
 
                 TotalStockIn = await _context.StockInDetails.SumAsync(x => (decimal?)x.Total) ?? 0,
@@ -84,7 +84,7 @@ namespace POS_Management_System.Controllers
                 var monthEnd = monthStart.AddMonths(1);
 
                 var sales = await _context.StockOutDetails
-                    .Where(x => x.StockOut.Date >= monthStart && x.StockOut.Date < monthEnd)
+                    .Where(x => x.StockOut != null && x.StockOut.Date >= monthStart && x.StockOut.Date < monthEnd)
                     .SumAsync(x => (decimal?)x.Total) ?? 0;
 
                 list.Add(new { month = monthStart.ToString("MMM yyyy"), sales });
@@ -107,11 +107,11 @@ namespace POS_Management_System.Controllers
                 var monthEnd = monthStart.AddMonths(1);
 
                 var stockIn = await _context.StockInDetails
-                    .Where(x => x.StockIn.Date >= monthStart && x.StockIn.Date < monthEnd)
+                    .Where(x => x.StockIn != null && x.StockIn.Date >= monthStart && x.StockIn.Date < monthEnd)
                     .SumAsync(x => (decimal?)x.Total) ?? 0;
 
                 var stockOut = await _context.StockOutDetails
-                    .Where(x => x.StockOut.Date >= monthStart && x.StockOut.Date < monthEnd)
+                    .Where(x => x.StockOut != null && x.StockOut.Date >= monthStart && x.StockOut.Date < monthEnd)
                     .SumAsync(x => (decimal?)x.Total) ?? 0;
 
                 list.Add(new { month = monthStart.ToString("MMM yyyy"), stockIn, stockOut });

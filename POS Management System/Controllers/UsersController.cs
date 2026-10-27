@@ -69,9 +69,9 @@ namespace POS_Management_System.Controllers
             var model = new EditUserViewModel
             {
                 Id = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber
+                UserName = user.UserName!,
+                Email = user.Email!,
+                PhoneNumber = user.PhoneNumber!
             };
 
             return View(model);
@@ -164,8 +164,8 @@ namespace POS_Management_System.Controllers
             var model = new AssignRoleViewModel
             {
                 UserId = user.Id,
-                UserName = user.UserName,
-                SelectedRole = currentRole,
+                UserName = user.UserName!,
+                SelectedRole = currentRole!,
                 Roles = roles
             };
 

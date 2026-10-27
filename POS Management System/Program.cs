@@ -12,25 +12,16 @@ using POS_Management_System.Services.Email;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");;
 
-// Detect whether the connection string targets SQLite (file-based) or a SQL Server instance.
 var useSqlite = connectionString.StartsWith("Data Source=", StringComparison.OrdinalIgnoreCase)
                 || connectionString.EndsWith(".db", StringComparison.OrdinalIgnoreCase)
                 || connectionString.Contains(".sqlite", StringComparison.OrdinalIgnoreCase);
 
-if (useSqlite)
-{
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlite(connectionString));
-    builder.Services.AddHangfire(x => x.UseMemoryStorage());
-    builder.Services.AddHangfireServer();
-}
-else
-{
+
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlServer(connectionString));
     builder.Services.AddHangfire(x => x.UseSqlServerStorage(connectionString));
     builder.Services.AddHangfireServer();
-}
+
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;
@@ -40,7 +31,7 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
      
      }).AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
-// Add services to the container.
+
 builder.Services.AddControllersWithViews(options =>
 {
     var policy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
@@ -66,7 +57,6 @@ using(var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        // Ensure database directory exists when using SQLite so the file can be created inside container/host volume
         if (useSqlite)
         {
             try
@@ -95,7 +85,6 @@ using(var scope = app.Services.CreateScope())
             }
         }
 
-        // Apply any pending EF Core migrations (works for SQLite and SQL Server)
         var db = services.GetRequiredService<ApplicationDbContext>();
         db.Database.Migrate();
 
@@ -109,7 +98,6 @@ using(var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
