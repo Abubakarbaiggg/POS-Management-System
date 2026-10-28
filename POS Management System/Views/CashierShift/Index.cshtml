@@ -3,21 +3,17 @@
 @{
     ViewData["Title"] = "Cashier Shift Managment";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["PageCategory"] = "Administration";
+    ViewData["PageTitle"] = "Cashier Shift";
+    ViewData["PageDescription"] = "Manage cashier shift date and timing";
+    ViewData["PageIcon"] = "bi-people";
 }
 
 <main class="dashboard-content">
     <div class="container-fluid px-3 px-lg-4 py-4">
 
         <div class="page-heading">
-            <div class="page-heading-copy">
-                <span class="page-icon"><i class="bi bi-people"></i></span>
-                <div>
-                    <p class="eyebrow mb-1">Administration</p>
-                    <h1 class="h3 mb-1">Cashier Shift</h1>
-                    <p class="text-muted mb-0">Manage cashier shift date and timing</p>
-                </div>
-            </div>
-
+            <partial name="_PageHeader" />
             <div class="heading-actions">
                 <a asp-action="Create" class="btn btn-primary btn-sm">
                     <i class="bi bi-person-plus"></i> Create User
@@ -25,21 +21,6 @@
             </div>
         </div>
 
-        @* @if (TempData["Success"] != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                @TempData["Success"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
-
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                @TempData["Error"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        } *@
 
         <section class="panel">
             <div class="table-responsive">

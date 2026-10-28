@@ -235,14 +235,18 @@ namespace POS_Management_System.Migrations
                     b.Property<int>("AttendanceStatus")
                         .HasColumnType("int");
 
-                    b.Property<int>("BreakMinutes")
+                    b.Property<int?>("BreakMinutes")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ClockIn")
+                    b.Property<DateTime?>("ClockIn")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("ClockOut")
+                    b.Property<DateTime?>("ClockOut")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

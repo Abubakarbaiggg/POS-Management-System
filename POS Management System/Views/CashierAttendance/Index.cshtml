@@ -1,8 +1,8 @@
 ﻿@model IEnumerable<POS_Management_System.Models.Category>
 
 @{
-    ViewData["Title"] = "Categories";
-    ViewData["PageTitle"] = "Categories";
+    ViewData["PageCategory"] = "Management";
+    ViewData["PageTitle"] = "Cashier Management";
     ViewData["PageDescription"] = "Manage product categories and cashier attendance.";
     ViewData["PageIcon"] = "bi-tags";
 }
@@ -11,17 +11,20 @@
     <div class="container-fluid px-3 px-lg-4 py-4">
 
         <div class="page-heading">
-            <div class="page-heading-copy">
-                <span class="page-icon">
-                    <i class="bi bi-tags" aria-hidden="true"></i>
-                </span>
-                <div>
-                    <p class="eyebrow mb-1">Management</p>
-                    <h1 class="h3 mb-1">Categories</h1>
-                    <p class="text-muted mb-0">
-                        Manage product categories and cashier attendance.
-                    </p>
-                </div>
+            <partial name="_PageHeader" />
+
+            <div class="card shadow-sm px-3 py-2">
+                <small class="text-muted">
+                    <i class="bi bi-clock me-1"></i> Total Time
+                </small>
+                <h5 class="mb-0">08:30:00</h5>
+            </div>
+
+            <div class="card shadow-sm px-3 py-2">
+                <small class="text-muted">
+                    <i class="bi bi-cup-hot me-1"></i> Break Time
+                </small>
+                <h5 class="mb-0">00:30:00</h5>
             </div>
 
             <div class="d-flex flex-wrap gap-2">
@@ -41,64 +44,96 @@
                     </button>
                 </form>
 
-                <form asp-controller="CashierAttendance" asp-action="AddBreak" method="post" class="d-inline">
+                
+                <form asp-controller="CashierAttendance" asp-action="Ready" method="post" class="d-inline">
                     @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-warning">
-                        <i class="bi bi-cup-hot me-1" aria-hidden="true"></i>
-                        Add Break
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle me-1" aria-hidden="true"></i>
+                        Ready
                     </button>
                 </form>
 
-                <a asp-action="Create" class="btn btn-primary">
-                    <i class="bi bi-plus-circle me-1" aria-hidden="true"></i>
-                    Add Category
-                </a>
+
+                <form asp-controller="CashierAttendance" asp-action="AddBreak" method="post"
+                      class="d-inline-flex align-items-center gap-2">
+
+                    @Html.AntiForgeryToken()
+
+                    <select name="breakType" class="form-select" required>
+                        <option value="">Select Break</option>
+                        <option value="Tea Break">Tea Break</option>
+                        <option value="Lunch Break">Lunch Break</option>
+                        <option value="Smoking Break">Smoking Break</option>
+                        <option value="Walk Break">Walk Break</option>
+                        <option value="Prayer Break">Prayer Break</option>
+                        <option value="Personal Break">Personal Break</option>
+                    </select>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-clock me-1" aria-hidden="true"></i>
+                        Add
+                    </button>
+                </form>
+
             </div>
         </div>
+        
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success mt-3">@TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger mt-3">@TempData["Error"]</div>
+        }
 
         <section class="panel">
             <div class="table-responsive">
                 <table class="table align-middle mb-0">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
+                            <th>Details</th>
+                            <th>Comment</th>
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model != null && Model.Any())
-                        {
-                            @foreach (var category in Model)
-                            {
                                 <tr>
-                                    <td>@category.Id</td>
-                                    <td class="fw-semibold">@category.Name</td>
+                                    <td class="fw-semibold">
+                                        Please check stock. One piece was missing last night.
+                                    </td>
+
+                                    <td class="fw-semibold">
+                                        Boss, the manager took this piece last time.
+                                    </td>
+
                                     <td class="text-end">
-                                        <a asp-action="Edit"
-                                           asp-route-id="@category.Id"
-                                           class="btn btn-warning btn-sm"
-                                           aria-label="Edit @category.Name">
-                                            <i class="bi bi-pencil" aria-hidden="true"></i>
-                                        </a>
-                                        <a asp-action="Delete"
-                                           asp-route-id="@category.Id"
-                                           class="btn btn-danger btn-sm"
-                                           aria-label="Delete @category.Name">
-                                            <i class="bi bi-trash" aria-hidden="true"></i>
-                                        </a>
+                                        <form asp-controller="CashierAttendance" asp-action="UpdateStatus" method="post"
+                                              class="d-inline-flex align-items-center gap-2">
+
+                                            @Html.AntiForgeryToken()
+                                            <div>
+                                                 <a asp-action="CashierReply" class="btn btn-primary">
+                                                    <i class="bi bi-plus-circle"></i> Reply
+                                                </a>
+                                            </div>
+                                            <input type="hidden" name="id"  />
+
+                                            <select name="status" class="form-select form-select-sm" required>
+                                                <option value="">Select Status</option>
+                                                <option value="Pending">Pending</option>
+                                                <option value="InProgress">In Progress</option>
+                                                <option value="Completed">Completed</option>
+                                                <option value="OnHold">On Hold</option>
+                                                <option value="Cancelled">Cancelled</option>
+                                            </select>
+
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="bi bi-check-circle me-1"></i>
+                                                Update
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="3" class="text-center text-muted py-4">
-                                    No categories found.
-                                </td>
-                            </tr>
-                        }
                     </tbody>
                 </table>
             </div>
