@@ -15,9 +15,10 @@ namespace POS_Management_System.Controllers
         {
             _context = context;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var breaks = await _context.Breaks.ToListAsync();
+            return View(breaks);
         }
 
         public IActionResult CashierReply()
@@ -47,12 +48,11 @@ namespace POS_Management_System.Controllers
                 .AnyAsync(x =>
                     x.UserId == userId &&
                     x.ClockIn >= today &&
-                    x.ClockIn < today.AddDays(1) &&
-                    x.ClockOut == null);
+                    x.ClockIn < today.AddDays(1));
 
             if (checkClockIn)
             {
-                TempData["error"] = "You have already punched in.";
+                TempData["error"] = "You have already punched in today.";
                 return RedirectToAction("Index", "CashierAttendance");
             }
 
@@ -101,6 +101,26 @@ namespace POS_Management_System.Controllers
 
         public async Task<IActionResult> Ready()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Challenge();
+            }
+            var today = DateTime.Today;
+            var attendance = await _context.CashierAttendances
+                          .Where(x =>
+                              x.UserId == userId &&
+                              x.ClockIn >= today &&
+                              x.ClockIn < today.AddDays(1)).OrderByDescending(x => x.ClockIn).FirstOrDefaultAsync();
+
+            if (attendance == null)
+            {
+                TempData["error"] = "Please punch in first.";
+                return RedirectToAction("Index");
+            }
+
+
+
             TempData["success"] = "Ready successfuly.";
             return RedirectToAction("Index", "CashierAttendance");
         }

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<POS_Management_System.Models.Category>
+﻿@model IEnumerable<POS_Management_System.Models.Break>
 
 @{
     ViewData["PageCategory"] = "Management";
@@ -61,12 +61,9 @@
 
                     <select name="breakType" class="form-select" required>
                         <option value="">Select Break</option>
-                        <option value="Tea Break">Tea Break</option>
-                        <option value="Lunch Break">Lunch Break</option>
-                        <option value="Smoking Break">Smoking Break</option>
-                        <option value="Walk Break">Walk Break</option>
-                        <option value="Prayer Break">Prayer Break</option>
-                        <option value="Personal Break">Personal Break</option>
+                        @foreach(var item in Model){
+                            <option value="@item.Id">@item.Name</option>
+                        }
                     </select>
                     <button type="submit" class="btn btn-success">
                         <i class="bi bi-clock me-1" aria-hidden="true"></i>

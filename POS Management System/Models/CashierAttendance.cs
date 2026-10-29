@@ -9,8 +9,8 @@ namespace POS_Management_System.Models
         public string UserId { get; set; } = string.Empty;
         public DateTime? ClockIn { get; set; }
         public DateTime? ClockOut { get; set; }
-        public int? BreakMinutes { get; set; }
         public AttendanceStatus AttendanceStatus { get; set; } = AttendanceStatus.Scheduled;
+        public virtual ICollection<CashierBreak> CashierBreaks { get; set; } = new List<CashierBreak>();
     }
     public enum AttendanceStatus
     {

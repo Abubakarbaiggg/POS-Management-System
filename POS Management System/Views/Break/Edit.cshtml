@@ -1,0 +1,65 @@
+﻿@model POS_Management_System.Models.Break
+
+@{
+    ViewData["Title"] = "Edit Break";
+}
+
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-tags" aria-hidden="true"></i>
+                </span>
+
+                <div>
+                    <p class="eyebrow mb-1">Break Management</p>
+                    <h1 class="h3 mb-1">Edit Category</h1>
+                    <p class="text-muted mb-0">
+                        Update category information and save your changes.
+                    </p>
+                </div>
+            </div>
+
+            <div class="heading-actions">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+
+        <section class="row g-3">
+            <div class="col-12">
+                <form asp-action="Edit" method="post" class="panel">
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="p-3">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">
+                                Category Name
+                            </label>
+                            <input asp-for="Name" class="form-control" placeholder="Enter break name" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 p-3 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

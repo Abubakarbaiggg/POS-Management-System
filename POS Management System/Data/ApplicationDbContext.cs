@@ -25,6 +25,9 @@ namespace POS_Management_System.Data
         public DbSet<SupplierPayment> SupplierPayments { get; set; }
         public DbSet<WorkShifts> WorkShifts { get; set; }
         public DbSet<CashierAttendance> CashierAttendances { get; set; }
+        public DbSet<Break> Breaks { get; set; }
+        public DbSet<CashierBreak> CashierBreaks { get; set; }
+
 
     }
 }

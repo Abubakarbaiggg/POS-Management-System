@@ -103,6 +103,12 @@
             <span class="nav-text">Cashier Shift</span>
         </a>
 
+        <a class="nav-link @(currentController == "Break" ? "active" : "")"
+           asp-controller="Break" asp-action="Index">
+            <span class="nav-icon"><i class="bi bi-person-circle"></i></span>
+            <span class="nav-text">Breaks</span>
+        </a>
+
         
         <a class="nav-link @(currentController == "CashierAttendance" ? "active" : "")"
            asp-controller="CashierAttendance" asp-action="Index">

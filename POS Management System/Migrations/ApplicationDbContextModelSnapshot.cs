@@ -224,6 +224,26 @@ namespace POS_Management_System.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("POS_Management_System.Models.Break", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Breaks");
+                });
+
             modelBuilder.Entity("POS_Management_System.Models.CashierAttendance", b =>
                 {
                     b.Property<int>("Id")
@@ -233,9 +253,6 @@ namespace POS_Management_System.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AttendanceStatus")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("BreakMinutes")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("ClockIn")
@@ -251,6 +268,39 @@ namespace POS_Management_System.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CashierAttendances");
+                });
+
+            modelBuilder.Entity("POS_Management_System.Models.CashierBreak", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BreakId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CashierAttendanceId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("End")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("Start")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BreakId");
+
+                    b.HasIndex("CashierAttendanceId");
+
+                    b.ToTable("CashierBreaks");
                 });
 
             modelBuilder.Entity("POS_Management_System.Models.Category", b =>
@@ -702,6 +752,25 @@ namespace POS_Management_System.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("POS_Management_System.Models.CashierBreak", b =>
+                {
+                    b.HasOne("POS_Management_System.Models.Break", "Break")
+                        .WithMany("CashierBreak")
+                        .HasForeignKey("BreakId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("POS_Management_System.Models.CashierAttendance", "CashierAttandance")
+                        .WithMany("CashierBreaks")
+                        .HasForeignKey("CashierAttendanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Break");
+
+                    b.Navigation("CashierAttandance");
+                });
+
             modelBuilder.Entity("POS_Management_System.Models.CustomerPayment", b =>
                 {
                     b.HasOne("POS_Management_System.Models.StockOut", "StockOut")
@@ -823,6 +892,16 @@ namespace POS_Management_System.Migrations
                         .IsRequired();
 
                     b.Navigation("StockIn");
+                });
+
+            modelBuilder.Entity("POS_Management_System.Models.Break", b =>
+                {
+                    b.Navigation("CashierBreak");
+                });
+
+            modelBuilder.Entity("POS_Management_System.Models.CashierAttendance", b =>
+                {
+                    b.Navigation("CashierBreaks");
                 });
 
             modelBuilder.Entity("POS_Management_System.Models.Category", b =>

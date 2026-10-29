@@ -1,0 +1,79 @@
+﻿@model POS_Management_System.Models.Break
+
+@{
+    ViewData["Title"] = "Create Break";
+}
+
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <!-- Page Header -->
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-folder-plus" aria-hidden="true"></i>
+                </span>
+
+                <div>
+                    <p class="eyebrow mb-1">Inventory Management</p>
+                    <h1 class="h3 mb-1">Create Break</h1>
+                    <p class="text-muted mb-0">
+                        Add a new category to organize your products.
+                    </p>
+                </div>
+            </div>
+
+            <div class="heading-actions">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+
+        <section class="row g-3">
+
+            <div class="col-12">
+
+                <form asp-action="Create" method="post" class="panel">
+
+                    <div class="p-3">
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Category Name</label>
+
+                            <input asp-for="Name"
+                                   class="form-control"
+                                   placeholder="Enter category name" />
+
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="d-flex justify-content-end gap-2 p-3 border-top">
+
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check2-circle"></i> Create Category
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </div>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

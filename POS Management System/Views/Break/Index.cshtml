@@ -1,0 +1,60 @@
+﻿@model IEnumerable<POS_Management_System.Models.Break>
+
+@{
+    ViewData["Title"] = "Categories";
+    ViewData["PageCategory"] = "Management";
+    ViewData["PageTitle"] = "Breaks Management";
+    ViewData["PageDescription"] = "Manage product categories and Breaks attendance.";
+    ViewData["PageIcon"] = "bi-tags";
+}
+
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <div class="page-heading">
+            <partial name="_PageHeader" />
+            <div>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Add Break
+                </a>
+            </div>
+        </div>
+        <section class="panel">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var Breaks in Model)
+                        {
+                            <tr>
+                                <td>@Breaks.Id</td>
+                                <td class="fw-semibold">
+                                    @Breaks.Name
+                                </td>
+                                <td class="text-end">
+                                    <a asp-action="Edit" asp-route-id="@Breaks.Id" class="btn btn-warning btn-sm">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@Breaks.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+
+                                    <input type="hidden" asp-for="@Breaks.Id" />
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</main>
