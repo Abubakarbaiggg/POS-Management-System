@@ -684,6 +684,12 @@ namespace POS_Management_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
+
                     b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time");
 
@@ -691,12 +697,22 @@ namespace POS_Management_System.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ShiftName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
 
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("WorkShifts");
                 });
@@ -892,6 +908,17 @@ namespace POS_Management_System.Migrations
                         .IsRequired();
 
                     b.Navigation("StockIn");
+                });
+
+            modelBuilder.Entity("POS_Management_System.Models.WorkShifts", b =>
+                {
+                    b.HasOne("POS_Management_System.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("POS_Management_System.Models.Break", b =>

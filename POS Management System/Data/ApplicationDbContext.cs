@@ -27,7 +27,5 @@ namespace POS_Management_System.Data
         public DbSet<CashierAttendance> CashierAttendances { get; set; }
         public DbSet<Break> Breaks { get; set; }
         public DbSet<CashierBreak> CashierBreaks { get; set; }
-
-
     }
 }

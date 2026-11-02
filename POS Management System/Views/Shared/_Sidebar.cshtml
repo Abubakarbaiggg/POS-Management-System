@@ -1,176 +1,140 @@
 ﻿@{
     var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
 }
-<aside class="admin-sidebar" id="adminSidebar" aria-label="Main navigation">
 
+<aside class="admin-sidebar" id="adminSidebar" aria-label="Main navigation">
     <div class="sidebar-header">
         <a class="brand-mark" href="index.html">
             <span class="brand-icon">
                 <i class="bi bi-grid-1x2-fill"></i>
             </span>
             <span class="brand-copy">
-                <span class="brand-title">POS</span>    
+                <span class="brand-title">POS</span>
                 <span class="brand-subtitle">Management System</span>
             </span>
         </a>
     </div>
-  
+
     <nav class="sidebar-nav">
         @if (User.HasClaim("Permission", "Dashboard View"))
         {
-            <a class="nav-link @(currentController == "Dashboard" ? "active" : "")"
-            asp-controller="Dashboard" asp-action="Index">
+            <a class="nav-link @(currentController == "Dashboard" ? "active" : "")" asp-controller="Dashboard" asp-action="Index">
                 <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
                 <span class="nav-text">Dashboard</span>
             </a>
         }
+
         @if (User.HasClaim("Permission", "Permission View"))
         {
-            <a class="nav-link @(currentController == "Permissions" ? "active" : "")"
-            asp-controller="Permissions" asp-action="Index">
+            <a class="nav-link @(currentController == "Permissions" ? "active" : "")" asp-controller="Permissions" asp-action="Index">
                 <span class="nav-icon"><i class="bi bi-shield-lock"></i></span>
                 <span class="nav-text">Permissions</span>
             </a>
         }
+
         @if (User.HasClaim("Permission", "Role View"))
         {
-            <a class="nav-link @(currentController == "Roles" ? "active" : "")"
-            asp-controller="Roles" asp-action="Index">
+            <a class="nav-link @(currentController == "Roles" ? "active" : "")" asp-controller="Roles" asp-action="Index">
                 <span class="nav-icon"><i class="bi bi-person-badge"></i></span>
                 <span class="nav-text">Roles</span>
             </a>
         }
+
         @if (User.HasClaim("Permission", "Category View"))
         {
-            <a class="nav-link @(currentController == "Category" ? "active" : "")"
-            asp-controller="Category" asp-action="Index">
+            <a class="nav-link @(currentController == "Category" ? "active" : "")" asp-controller="Category" asp-action="Index">
                 <span class="nav-icon"><i class="bi bi-tags"></i></span>
                 <span class="nav-text">Category</span>
             </a>
         }
+
         @if (User.HasClaim("Permission", "Product View"))
         {
-            <a class="nav-link @(currentController == "Product" ? "active" : "")"
-            asp-controller="Product" asp-action="Index">
+            <a class="nav-link @(currentController == "Product" ? "active" : "")" asp-controller="Product" asp-action="Index">
                 <span class="nav-icon"><i class="bi bi-box-seam"></i></span>
                 <span class="nav-text">Product</span>
             </a>
         }
+
         @if (User.HasClaim("Permission", "Supplier View"))
         {
-            <a class="nav-link @(currentController == "Supplier" ? "active" : "")"
-            asp-controller="Supplier" asp-action="Index">
+            <a class="nav-link @(currentController == "Supplier" ? "active" : "")" asp-controller="Supplier" asp-action="Index">
                 <span class="nav-icon"><i class="bi bi-truck"></i></span>
                 <span class="nav-text">Supplier</span>
             </a>
         }
+
         @if (User.HasClaim("Permission", "StockIn View"))
         {
-            <a class="nav-link @(currentController == "StockIn" ? "active" : "")"
-            asp-controller="StockIn" asp-action="Index">
+            <a class="nav-link @(currentController == "StockIn" ? "active" : "")" asp-controller="StockIn" asp-action="Index">
                 <span class="nav-icon"><i class="bi bi-box-arrow-in-down"></i></span>
                 <span class="nav-text">Stock In</span>
             </a>
-            @if (User.HasClaim("Permission", "StockOut View"))
+        }
+
+        @if (User.HasClaim("Permission", "StockOut View"))
         {
-            <a class="nav-link @(currentController == "StockOut" ? "active" : "")"
-            asp-controller="StockOut" asp-action="Index">
+            <a class="nav-link @(currentController == "StockOut" ? "active" : "")" asp-controller="StockOut" asp-action="Index">
                 <span class="nav-icon"><i class="bi bi-box-arrow-up"></i></span>
                 <span class="nav-text">Stock Out</span>
             </a>
         }
-        }
+
         @if (User.HasClaim("Permission", "Customer View"))
         {
-            <a class="nav-link @(currentController == "Customer" ? "active" : "")"
-            asp-controller="Customer" asp-action="Index">
+            <a class="nav-link @(currentController == "Customer" ? "active" : "")" asp-controller="Customer" asp-action="Index">
                 <span class="nav-icon"><i class="bi bi-people"></i></span>
                 <span class="nav-text">Customer</span>
             </a>
         }
+
         @if (User.HasClaim("Permission", "User View"))
         {
-            <a class="nav-link @(currentController == "Users" ? "active" : "")"
-               asp-controller="Users" asp-action="Index">
+            <a class="nav-link @(currentController == "Users" ? "active" : "")" asp-controller="Users" asp-action="Index">
                 <span class="nav-icon"><i class="bi bi-person-circle"></i></span>
                 <span class="nav-text">Users</span>
             </a>
         }
 
-        <a class="nav-link @(currentController == "CashierShift" ? "active" : "")"
-           asp-controller="CashierShift" asp-action="Index">
+        <a class="nav-link @(currentController == "WorkShift" ? "active" : "")" asp-controller="WorkShift" asp-action="Index">
             <span class="nav-icon"><i class="bi bi-person-circle"></i></span>
             <span class="nav-text">Cashier Shift</span>
         </a>
 
-        <a class="nav-link @(currentController == "Break" ? "active" : "")"
-           asp-controller="Break" asp-action="Index">
+        <a class="nav-link @(currentController == "Break" ? "active" : "")" asp-controller="Break" asp-action="Index">
             <span class="nav-icon"><i class="bi bi-person-circle"></i></span>
             <span class="nav-text">Breaks</span>
         </a>
 
-        
-        <a class="nav-link @(currentController == "CashierAttendance" ? "active" : "")"
-           asp-controller="CashierAttendance" asp-action="Index">
+        <a class="nav-link @(currentController == "CashierAttendance" ? "active" : "")" asp-controller="CashierAttendance" asp-action="Index">
             <span class="nav-icon"><i class="bi bi-person-circle"></i></span>
             <span class="nav-text">Cashier Attendance</span>
         </a>
 
         <div class="nav-item">
-
-            <a class="nav-link d-flex justify-content-between align-items-center"
-               data-bs-toggle="collapse"
-               href="#reportsMenu"
-               role="button"
-               aria-expanded="false"
-               aria-controls="reportsMenu">
-
+            <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#reportsMenu" role="button" aria-expanded="false" aria-controls="reportsMenu">
                 <div>
-                    <span class="nav-icon">
-                        <i class="bi bi-bar-chart"></i>
-                    </span>
+                    <span class="nav-icon"><i class="bi bi-bar-chart"></i></span>
                     <span class="nav-text">Reports</span>
                 </div>
-
                 <i class="bi bi-chevron-down small"></i>
             </a>
 
             <div class="collapse" id="reportsMenu">
-
                 <nav class="nav flex-column ms-4 mt-2">
-
                     <a class="nav-link" asp-controller="SaleReport" asp-action="Index">
                         <i class="bi bi-cash-stack me-2"></i> Sales Report
                     </a>
-
                     <a class="nav-link" asp-controller="StockReport" asp-action="Index">
                         <i class="bi bi-box-seam me-2"></i> Stock Report
                     </a>
-
-                    @* <a class="nav-link" asp-controller="CustomerReport" asp-action="Index">
-                        <i class="bi bi-people me-2"></i> Customer Report
-                    </a>
-
-                    <a class="nav-link" asp-controller="SupplierReport" asp-action="Index">
-                        <i class="bi bi-truck me-2"></i> Supplier Report
-                    </a>
-
-                    <a class="nav-link" asp-controller="ProfitReport" asp-action="Index">
-                        <i class="bi bi-graph-up-arrow me-2"></i> Profit Report
-                    </a> *@
-
                 </nav>
-
             </div>
-
         </div>
-
-
     </nav>
 
     <div class="sidebar-footer">
         <span class="status-dot"></span>
         <span class="sidebar-footer-text">System running smoothly</span>
     </div>
-
 </aside>
