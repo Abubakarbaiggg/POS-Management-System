@@ -26,15 +26,38 @@ namespace POS_Management_System.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(WorkShifts model)
+        public async Task<IActionResult> Create(WorkShifts model, List<string> UserIds)
         {
-            if (!ModelState.IsValid)
+            if (UserIds == null || !UserIds.Any())
             {
-                ViewBag.Cashiers = await _userManager.GetUsersInRoleAsync("Cashier");
+                ModelState.AddModelError("", "Please select at least one cashier.");
             }
-            _context.WorkShifts.Add(model);
+
+            if (!ModelState.IsValid)
+            {   
+                ViewBag.Cashiers = await _userManager.GetUsersInRoleAsync("Cashier");
+                return View(model);
+            }
+
+            foreach (var userId in UserIds)
+            {
+                var shift = new WorkShifts
+                {
+                    UserId = userId,
+                    ShiftName = model.ShiftName,
+                    StartDate = model.StartDate,
+                    EndDate = model.EndDate,
+                    StartTime = model.StartTime,
+                    EndTime = model.EndTime,
+                    IsActive = true,
+                    CreatedAt = DateTime.Now
+                };
+
+                _context.WorkShifts.Add(shift);
+            }
+
             await _context.SaveChangesAsync();
-            TempData["Success"] = "Cashier shift created successfully";
+            TempData["Success"] = "Shift assigned to selected cashiers successfully.";
             return RedirectToAction("Index");
         }
         public IActionResult Edit()
