@@ -26,9 +26,9 @@ namespace POS_Management_System.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(WorkShifts model, List<string> UserIds)
+        public async Task<IActionResult> Create(WorkShifts model, [FromForm(Name = "UserIds")] List<string> userIds)
         {
-            if (UserIds == null || !UserIds.Any())
+            if (userIds == null || !userIds.Any())
             {
                 ModelState.AddModelError("", "Please select at least one cashier.");
             }
@@ -39,7 +39,7 @@ namespace POS_Management_System.Controllers
                 return View(model);
             }
 
-            foreach (var userId in UserIds)
+            foreach (var userId in userIds)
             {
                 var shift = new WorkShifts
                 {
@@ -51,7 +51,7 @@ namespace POS_Management_System.Controllers
                     EndTime = model.EndTime,
                     IsActive = true,
                     CreatedAt = DateTime.Now
-                };
+                };  
 
                 _context.WorkShifts.Add(shift);
             }
