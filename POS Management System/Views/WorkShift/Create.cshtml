@@ -31,7 +31,7 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Select Cashiers</label>
-                                <select name="UserIds" id="UserIds" class="form-select" multiple="multiple" required size="5">
+                                <select name="UserIds" id="UserIds" class="form-select cashier-select" multiple="multiple" required size="2" aria-describedby="cashier-select-help">
                                     @if (ViewBag.Cashiers != null)
                                     {
                                         foreach (var cashier in ViewBag.Cashiers)
@@ -42,7 +42,7 @@
                                         }
                                     }
                                 </select>
-                                <small class="text-muted">Hold Ctrl to select multiple cashiers.</small>
+                                <small id="cashier-select-help" class="form-text text-muted">Hold Ctrl to select multiple cashiers.</small>
                             </div>
 
                             <div class="col-md-6">

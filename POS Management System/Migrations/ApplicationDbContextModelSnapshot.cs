@@ -706,15 +706,33 @@ namespace POS_Management_System.Migrations
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time");
 
+                    b.HasKey("Id");
+
+                    b.ToTable("WorkShifts");
+                });
+
+            modelBuilder.Entity("POS_Management_System.Models.WorkShiftsCashier", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("WorkShiftId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("WorkShifts");
+                    b.HasIndex("WorkShiftId");
+
+                    b.ToTable("WorkShiftsCashiers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -910,7 +928,7 @@ namespace POS_Management_System.Migrations
                     b.Navigation("StockIn");
                 });
 
-            modelBuilder.Entity("POS_Management_System.Models.WorkShifts", b =>
+            modelBuilder.Entity("POS_Management_System.Models.WorkShiftsCashier", b =>
                 {
                     b.HasOne("POS_Management_System.Models.ApplicationUser", "User")
                         .WithMany()
@@ -918,7 +936,15 @@ namespace POS_Management_System.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("POS_Management_System.Models.WorkShifts", "WorkShift")
+                        .WithMany("Cashiers")
+                        .HasForeignKey("WorkShiftId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("User");
+
+                    b.Navigation("WorkShift");
                 });
 
             modelBuilder.Entity("POS_Management_System.Models.Break", b =>
@@ -970,6 +996,11 @@ namespace POS_Management_System.Migrations
             modelBuilder.Entity("POS_Management_System.Models.Supplier", b =>
                 {
                     b.Navigation("StockIns");
+                });
+
+            modelBuilder.Entity("POS_Management_System.Models.WorkShifts", b =>
+                {
+                    b.Navigation("Cashiers");
                 });
 #pragma warning restore 612, 618
         }

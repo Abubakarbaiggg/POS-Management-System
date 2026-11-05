@@ -1356,6 +1356,54 @@ html[data-theme="dark"] .auth-body {
   color: var(--admin-muted);
 }
 
+.cashier-select {
+  min-height: 7.25rem;
+  padding: 0.35rem;
+  border-radius: 0.5rem;
+  background-color: var(--admin-surface);
+  color: var(--admin-text);
+  scrollbar-color: #94a3b8 transparent;
+}
+
+.cashier-select option {
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.3rem;
+  color: var(--admin-text);
+  background-color: var(--admin-surface);
+}
+
+.cashier-select option:checked {
+  background: linear-gradient(var(--admin-primary), var(--admin-primary));
+  color: #ffffff;
+}
+
+.cashier-select option:hover {
+  background-color: #eaf2ff;
+  color: var(--admin-primary-dark);
+}
+
+.cashier-select::-webkit-scrollbar {
+  width: 0.55rem;
+}
+
+.cashier-select::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #94a3b8;
+}
+
+.cashier-select::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html[data-theme="dark"] .cashier-select option:hover {
+  background-color: #1e3a5f;
+  color: #bfdbfe;
+}
+
+.cashier-select:focus {
+  box-shadow: var(--admin-ring);
+}
+
 .text-muted {
   color: var(--admin-muted) !important;
 }
